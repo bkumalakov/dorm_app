@@ -1,5 +1,6 @@
 from django.contrib import admin
 from . import models
+from oil_grants import models as grant_models
 
 
 class DormAdmin(admin.ModelAdmin):
@@ -20,3 +21,4 @@ admin.site.register(models.Dorm, DormAdmin)
 admin.site.register(models.Room, RoomAdmin)
 admin.site.register(models.Application, ApplicationAdmin)
 admin.site.register(models.Registration)
+

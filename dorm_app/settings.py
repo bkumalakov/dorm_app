@@ -20,6 +20,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'residents_app.apps.ResidentsAppConfig',
+    'oil_grants',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

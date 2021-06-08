@@ -7,6 +7,6 @@ admin.site.site_title = 'Общежития АУНиГ'
 admin.site.index_title = 'Система управления заселением в общежития АУНиГ'
 
 urlpatterns = [
-    path('', include('residents_app.urls')),
+    path('', include('oil_grants.urls')),
     path('admin/', admin.site.urls),
 ]
