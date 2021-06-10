@@ -13,14 +13,14 @@ SECRET_KEY = '%na)g!lk0wn+r641pahz_hv)h2$@6617)8zf$k2!g&87y3xnti'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'bolatzhan.pythonanywhere.com',
+    '127.0.0.1',
+]
 
 # Application definition
-
 INSTALLED_APPS = [
-    'residents_app.apps.ResidentsAppConfig',
-    'oil_grants',
+    'oil_grants.apps.OilGrantsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

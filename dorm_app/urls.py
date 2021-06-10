@@ -2,9 +2,9 @@
 from django.contrib import admin
 from django.urls import path, include
 
-admin.site.site_header = 'Общежития АУНиГ'
-admin.site.site_title = 'Общежития АУНиГ'
-admin.site.index_title = 'Система управления заселением в общежития АУНиГ'
+admin.site.site_header = 'Система АУНиГ'
+admin.site.site_title = 'Система АУНиГ'
+admin.site.index_title = 'Система АУНиГ'
 
 urlpatterns = [
     path('', include('oil_grants.urls')),

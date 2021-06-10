@@ -4,15 +4,17 @@ from . import models
 
 class ProgramGroupAdmin(admin.ModelAdmin):
     list_display = ('g_code', 'g_name')
+    search_fields = ('g_code', 'g_name')
 
 
 class EdProgramAdmin(admin.ModelAdmin):
     list_display = ('p_code', 'p_name')
+    search_fields = ('p_code', 'p_name')
 
 
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('s_name', 's_surname', 's_stateID', 's_email', 's_phoneNum')
-    search_fields = ('s_surname', 's_name')
+    search_fields = ('s_surname', 's_name', 's_stateID')
     fieldsets = (
         ('Личные данные обучающегося', {
             'fields': (('s_surname', 's_name', 's_fatherName'), 's_stateID', ('s_email', 's_phoneNum'),  'placeOfBirht', 'socialStatus')

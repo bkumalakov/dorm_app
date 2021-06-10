@@ -60,6 +60,9 @@ class Rating(models.Model):
     computerTest = models.IntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
     ratingDate = models.DateField(verbose_name='Дата составления рейтинга')
 
+    def __str__(self):
+        return "Обучающийся: " + ' ' + self.student.s_name + ' ' + self.student.s_surname + " (" + self.ratingDate.strftime("%m/%d/%Y") + ")"
+
     class Meta:
         verbose_name_plural = 'Рейтинги обучающихся'
         verbose_name = 'Рейтинг обучающихся'
@@ -89,6 +92,9 @@ class Grant(models.Model):
     duration = models.CharField(max_length=3, choices=DURATION_TYPES, verbose_name="Период оплаты")
     fee = models.IntegerField(verbose_name="Сумма гранта")
     contractNo = models.CharField(max_length=15, verbose_name="Номер договора")
+
+    def __str__(self):
+        return self.contractNo
 
     class Meta:
         verbose_name_plural = 'Списки присвоенных грантов'
