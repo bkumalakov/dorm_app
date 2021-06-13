@@ -1,9 +1,9 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def studentRating(request):
-    return HttpResponse("Страница рейтинга обучающихся.")
-
-
-def oilCompanyMoney(request):
-    return HttpResponse("Таблица с суммами недропользователей.")
+    return render(
+        request,
+        'oil_grant/index.html',
+        context={'page_title': 'Рейтинг обучающихся'},)
