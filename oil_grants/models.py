@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ProgramGroup(models.Model):
-    g_name = models.CharField(max_length=50, verbose_name="Наиминование направления подготовки")
+    g_name = models.CharField(max_length=150, verbose_name="Наиминование направления подготовки")
     g_code = models.CharField(max_length=6, verbose_name="Код направления подготовки")
 
     def __str__(self):
@@ -20,7 +20,7 @@ class EdProgram(models.Model):
         ('PhD', 'PhD'),
     )
 
-    p_name = models.CharField(max_length=50, verbose_name="Наиминование ОП")
+    p_name = models.CharField(max_length=150, verbose_name="Наиминование ОП")
     p_code = models.CharField(max_length=8, verbose_name="Код ОП")
     p_degreeLevel = models.CharField(max_length=3, choices=DEGREE_TYPES, verbose_name="Уровень обучения")
     group = models.ForeignKey(ProgramGroup, on_delete=models.CASCADE)
@@ -34,17 +34,17 @@ class EdProgram(models.Model):
 
 
 class Student(models.Model):
-    s_name = models.CharField(max_length=50, verbose_name="Имя")
-    s_surname = models.CharField(max_length=50, verbose_name="Фамилия")
-    s_fatherName = models.CharField(max_length=50, verbose_name="Отчество", blank=True)
+    s_name = models.CharField(max_length=150, verbose_name="Имя")
+    s_surname = models.CharField(max_length=150, verbose_name="Фамилия")
+    s_fatherName = models.CharField(max_length=150, verbose_name="Отчество", blank=True)
     s_stateID = models.IntegerField(unique=True, verbose_name="ИИН")
-    s_email = models.CharField(max_length=50, verbose_name="Email адрес")
+    s_email = models.CharField(max_length=250, verbose_name="Email адрес")
     s_phoneNum = models.CharField(max_length=50, verbose_name="Номер телефона")
     edProgram = models.ForeignKey(EdProgram, on_delete=models.CASCADE)
     admission = models.DateField(verbose_name="Дата поступления")
     gpa = models.FloatField(verbose_name="GPA")
     socialStatus = models.CharField(max_length=50, verbose_name="Социальный статус", blank=True)
-    placeOfBirht = models.CharField(max_length=50, verbose_name="Место рождения", blank=True)
+    placeOfBirht = models.CharField(max_length=250, verbose_name="Место рождения", blank=True)
 
     def __str__(self):
         return self.s_name + " " + self.s_surname
