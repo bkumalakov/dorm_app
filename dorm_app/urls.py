@@ -8,5 +8,6 @@ admin.site.index_title = 'Система АУНиГ'
 
 urlpatterns = [
     path('', include('oil_grants.urls')),
+    path('users/', include('users_app.urls')),
     path('admin/', admin.site.urls),
 ]

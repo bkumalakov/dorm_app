@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 
@@ -12,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '%na)g!lk0wn+r641pahz_hv)h2$@6617)8zf$k2!g&87y3xnti'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = [
     'bkumalakov.pythonanywhere.com',
@@ -28,6 +29,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #azamat7087
+    'phonenumber_field',
+    'phonenumbers',
+    'user_agents',
+    'users_app',
 ]
 
 MIDDLEWARE = [
@@ -38,7 +45,16 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware',
+
 ]
+
+AUTH_USER_MODEL = 'users_app.Users'  # Custom auth system
+
+AUTHENTICATION_BACKENDS = (
+    'users_app.backends.UsernameAuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend'
+)
 
 ROOT_URLCONF = 'dorm_app.urls'
 
@@ -106,8 +122,21 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.1/howto/static-files/
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+X_FRAME_OPTIONS = "SAMEORIGIN"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-STATIC_ROOT = BASE_DIR / 'static'
+# Default primary key field type
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+PHONENUMBER_DB_FORMAT = 'NATIONAL'
+PHONENUMBER_DEFAULT_REGION = 'KZ'

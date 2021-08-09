@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+Student = get_user_model()
 
 
 class ProgramGroup(models.Model):
@@ -33,35 +36,35 @@ class EdProgram(models.Model):
         verbose_name = 'Образовательная программа'
 
 
-class Student(models.Model):
-    s_name = models.CharField(max_length=150, verbose_name="Имя")
-    s_surname = models.CharField(max_length=150, verbose_name="Фамилия")
-    s_fatherName = models.CharField(max_length=150, verbose_name="Отчество", blank=True)
-    s_stateID = models.IntegerField(unique=True, verbose_name="ИИН")
-    s_email = models.CharField(max_length=250, verbose_name="Email адрес")
-    s_phoneNum = models.CharField(max_length=50, verbose_name="Номер телефона")
-    edProgram = models.ForeignKey(EdProgram, on_delete=models.CASCADE)
-    admission = models.DateField(verbose_name="Дата поступления")
-    gpa = models.FloatField(verbose_name="GPA")
-    socialStatus = models.CharField(max_length=50, verbose_name="Социальный статус", blank=True)
-    placeOfBirht = models.CharField(max_length=250, verbose_name="Место рождения", blank=True)
-
-    def __str__(self):
-        return self.s_name + " " + self.s_surname
-
-    class Meta:
-        verbose_name_plural = 'Обучающиеся'
-        verbose_name = 'Обучающийся'
+# class Student(models.Model):
+#     s_name = models.CharField(max_length=150, verbose_name="Имя")
+#     s_surname = models.CharField(max_length=150, verbose_name="Фамилия")
+#     s_fatherName = models.CharField(max_length=150, verbose_name="Отчество", blank=True)
+#     s_stateID = models.IntegerField(unique=True, verbose_name="ИИН")
+#     s_email = models.CharField(max_length=250, verbose_name="Email адрес")
+#     s_phoneNum = models.CharField(max_length=50, verbose_name="Номер телефона")
+#     edProgram = models.ForeignKey(EdProgram, on_delete=models.CASCADE)
+#     admission = models.DateField(verbose_name="Дата поступления")
+#     gpa = models.FloatField(verbose_name="GPA")
+#     socialStatus = models.CharField(max_length=50, verbose_name="Социальный статус", blank=True)
+#     placeOfBirht = models.CharField(max_length=250, verbose_name="Место рождения", blank=True)
+#
+#     def __str__(self):
+#         return self.s_name + " " + self.s_surname
+#
+#     class Meta:
+#         verbose_name_plural = 'Обучающиеся'
+#         verbose_name = 'Обучающийся'
 
 
 class Rating(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name='Обучающийся')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="rating",  verbose_name='Обучающийся')
     essay = models.IntegerField(verbose_name='Балл за эссе', blank=True, null=True)
     computerTest = models.IntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
     ratingDate = models.DateField(verbose_name='Дата составления рейтинга')
 
     def __str__(self):
-        return "Обучающийся: " + ' ' + self.student.s_name + ' ' + self.student.s_surname + " (" + self.ratingDate.strftime("%m/%d/%Y") + ")"
+        return "Обучающийся: " + ' ' + self.student.first_name + ' ' + self.student.last_name + " (" + self.ratingDate.strftime("%m/%d/%Y") + ")"
 
     class Meta:
         verbose_name_plural = 'Рейтинги обучающихся'
