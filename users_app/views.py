@@ -1,5 +1,6 @@
 import platform
 from django.contrib.auth.hashers import is_password_usable
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
@@ -72,6 +73,25 @@ def email_verification(request, user, email):
 '''Views'''
 
 
+class UserInfoView(LoginRequiredMixin, View):
+    def get(self, request,):
+        return render(self.request, 'users_app/user_info.html',)
+
+
+class UpdateUserView(LoginRequiredMixin, View):
+    def post(self, request):
+
+        form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('user_info_url')
+        return render(self.request, 'users_app/update_user.html', context={'form': form, })
+
+    def get(self, request,):
+        form = UpdateUserForm(instance=request.user)
+        return render(self.request, 'users_app/update_user.html', context={'form': form, })
+
+
 class Main(View):
     @staticmethod
     def get(request):
@@ -131,15 +151,14 @@ class Login(View):
         verif = ''
         if bound_form.is_valid():
             user = authenticate(username=bound_form.cleaned_data['username'], password=bound_form.cleaned_data['password'], )
-            if user and user.is_active:
+            if user.is_verified:
                 login(request, user)
                 user = Users.objects.get(id=request.user.id)
                 user.last_update = datetime.now()
                 user.last_login = datetime.now()
                 user.save()
                 return redirect('main_url')
-
-            elif user and not user.is_active:
+            else:
                 verif = True
 
             return render(request, 'users_app/Login.html', context={'form_log': bound_form, 'verif': verif})
@@ -163,15 +182,20 @@ class AccountRecovery(View):
         email = str(email).strip()
 
         user = get_object_or_404(Users, email=email)
+
+        if not user.is_verified:
+            return render(request, 'users_app/not_verified.html', )
+
         uidb64 = urlsafe_base64_encode(force_bytes(user.email))
         token = token_generator.make_token(user)
         domain = get_current_site(request).domain
         link = reverse('restore_url', kwargs={'uidb64': uidb64, 'token': token})
-        recovery_url = 'https://' + domain + link
+        recovery_url = 'http://' + domain + link
+        print(recovery_url)
         send_mail(
             'Restore your password',
             'Please click on link to change your password \n' + recovery_url,
-            'test@gmail.com',
+            'Атырауский университет нефти и газа',
             [email],
             fail_silently=False,
         )
@@ -217,8 +241,8 @@ class PasswordRestore(View):
     def get(request, uidb64, token):
         email = str(urlsafe_base64_decode(uidb64))[2: len(str(urlsafe_base64_decode(uidb64)))-1]
         user = Users.objects.get(email=email)
-        if not user.is_active:
-            return redirect('log_user_url', verif=True)
+        if not user.is_verified:
+            return render(request, 'users_app/not_verified.html',)
 
         return render(request, 'users_app/restore_password.html', context={'email': email,
                                                                         'uidb64': uidb64,

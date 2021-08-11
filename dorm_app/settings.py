@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import base64
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +54,7 @@ AUTH_USER_MODEL = 'users_app.Users'  # Custom auth system
 
 AUTHENTICATION_BACKENDS = (
     'users_app.backends.UsernameAuthenticationBackend',
+    'users_app.backends.EmailAuthenticationBackend',
     'django.contrib.auth.backends.ModelBackend'
 )
 
@@ -138,5 +140,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+def get_email_data(base64_message='MzYxMjcxMjkwMjA4MTM0Njc5ODUxOEF6YQ=='):
+    base64_bytes = base64_message.encode('ascii')
+    message_bytes = base64.b64decode(base64_bytes)
+    message = message_bytes.decode('ascii')
+    return message
+
+
 PHONENUMBER_DB_FORMAT = 'NATIONAL'
 PHONENUMBER_DEFAULT_REGION = 'KZ'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'azaza7087@gmail.com'
+EMAIL_HOST_PASSWORD = str(get_email_data())
+DEFAULT_FROM_EMAIL = '<anything you want>'

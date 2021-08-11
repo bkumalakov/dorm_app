@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User info</title>
+</head>
+<body>
+    <h1> Личный кабинет </h1>
+
+    <p>
+        Здравствуйте, {{ request.user.username }}
+    </p>
+
+    {% if  request.user.image   %}
+
+        <p>
+            <img src="{{ request.user.image }}" alt="Изображение не доступно">
+        </p>
+
+    {% endif %}
+    <p>
+        Имя: {{ request.user.first_name }}
+    </p>
+
+    <p>
+        Фамилия: {{ request.user.last_name }}
+    </p>
+
+    <p>
+        Отчество: {{ request.user.patronymic }}
+    </p>
+
+    <p>
+        Email: {{ request.user.email }}
+    </p>
+
+    <p>
+        ИИН: {{ request.user.uin }}
+    </p>
+
+    <p>
+        Статус: {{ request.user.status }}
+    </p>
+
+    <p>
+        Место рождения: {{ request.user.birthplace }}
+    </p>
+
+     {% if request.user.receipt_date %}
+        <p>
+            Дата поступления: {{ request.user.receipt_date }}
+        </p>
+     {% endif %}
+
+    <p>
+        GPA: {{ request.user.gpa }}
+    </p>
+
+    {% if request.user.edProgram %}
+
+        <p>
+            Образовательная программа: {{ request.user.edProgram.p_name }}
+        </p>
+
+    {% endif %}
+
+    <p>
+        <a href="{% url 'update_user_url' %}">Редактировать</a>
+    </p>
+
+</body>
+</html>

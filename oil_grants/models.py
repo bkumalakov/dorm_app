@@ -5,8 +5,10 @@ Student = get_user_model()
 
 
 class ProgramGroup(models.Model):
-    g_name = models.CharField(max_length=150, verbose_name="Наиминование направления подготовки")
+    g_name = models.CharField(max_length=150, verbose_name="Наименование направления подготовки")
     g_code = models.CharField(max_length=6, verbose_name="Код направления подготовки")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return self.g_code + " - " + self.g_name
@@ -23,10 +25,12 @@ class EdProgram(models.Model):
         ('PhD', 'PhD'),
     )
 
-    p_name = models.CharField(max_length=150, verbose_name="Наиминование ОП")
+    p_name = models.CharField(max_length=150, verbose_name="Наименование ОП")
     p_code = models.CharField(max_length=8, verbose_name="Код ОП")
     p_degreeLevel = models.CharField(max_length=3, choices=DEGREE_TYPES, verbose_name="Уровень обучения")
     group = models.ForeignKey(ProgramGroup, on_delete=models.CASCADE)
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return self.p_code + " - " + self.p_name
@@ -36,32 +40,13 @@ class EdProgram(models.Model):
         verbose_name = 'Образовательная программа'
 
 
-# class Student(models.Model):
-#     s_name = models.CharField(max_length=150, verbose_name="Имя")
-#     s_surname = models.CharField(max_length=150, verbose_name="Фамилия")
-#     s_fatherName = models.CharField(max_length=150, verbose_name="Отчество", blank=True)
-#     s_stateID = models.IntegerField(unique=True, verbose_name="ИИН")
-#     s_email = models.CharField(max_length=250, verbose_name="Email адрес")
-#     s_phoneNum = models.CharField(max_length=50, verbose_name="Номер телефона")
-#     edProgram = models.ForeignKey(EdProgram, on_delete=models.CASCADE)
-#     admission = models.DateField(verbose_name="Дата поступления")
-#     gpa = models.FloatField(verbose_name="GPA")
-#     socialStatus = models.CharField(max_length=50, verbose_name="Социальный статус", blank=True)
-#     placeOfBirht = models.CharField(max_length=250, verbose_name="Место рождения", blank=True)
-#
-#     def __str__(self):
-#         return self.s_name + " " + self.s_surname
-#
-#     class Meta:
-#         verbose_name_plural = 'Обучающиеся'
-#         verbose_name = 'Обучающийся'
-
-
 class Rating(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="rating",  verbose_name='Обучающийся')
     essay = models.IntegerField(verbose_name='Балл за эссе', blank=True, null=True)
     computerTest = models.IntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
     ratingDate = models.DateField(verbose_name='Дата составления рейтинга')
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return "Обучающийся: " + ' ' + self.student.first_name + ' ' + self.student.last_name + " (" + self.ratingDate.strftime("%m/%d/%Y") + ")"
@@ -72,8 +57,10 @@ class Rating(models.Model):
 
 
 class OilCompany(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Наиминование")
+    name = models.CharField(max_length=50, verbose_name="Наименование")
     address = models.CharField(max_length=50, verbose_name="Адрес")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return self.name
@@ -95,6 +82,8 @@ class Grant(models.Model):
     duration = models.CharField(max_length=3, choices=DURATION_TYPES, verbose_name="Период оплаты")
     fee = models.IntegerField(verbose_name="Сумма гранта")
     contractNo = models.CharField(max_length=15, verbose_name="Номер договора")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         return self.contractNo
@@ -102,3 +91,43 @@ class Grant(models.Model):
     class Meta:
         verbose_name_plural = 'Списки присвоенных грантов'
         verbose_name = 'Присвоенный грант'
+
+
+class Participants(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="applications",
+                                verbose_name="Учащийся")
+    is_passed = models.BooleanField(default=False, verbose_name="Прошел конкурс")
+    competition = models.ForeignKey('Competitions', on_delete=models.CASCADE, related_name="participants",
+                                    verbose_name="Конкурс")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        return self.student.first_name + " " + self.student.last_name + " " + str(self.is_passed)
+
+    class Meta:
+        verbose_name = "Заявка на конкурс"
+        verbose_name_plural = "Заявки на конкурсы"
+
+
+class Competitions(models.Model):
+    CHOICES = (
+        ("didn't start", "Не начался"),
+        ("goes on", "Продолжается"),
+        ("ended", "Завершился"),
+    )
+
+    start = models.DateField(verbose_name="Дата начала конкурса")
+    end = models.DateField(verbose_name="Дата Завершения конкурс")
+    status = models.CharField(choices=CHOICES, max_length=15, default="didn't start", verbose_name="Статус")
+    company = models.ForeignKey(OilCompany, related_name="competitions", on_delete=models.CASCADE,
+                                verbose_name="Компания недропользователь")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        return self.company.name + ", " + self.status
+
+    class Meta:
+        verbose_name = "Конкурс"
+        verbose_name_plural = "Конкурсы"

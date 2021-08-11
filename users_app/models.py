@@ -13,12 +13,13 @@ def only_int(value):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, username, password=None, ):
+    def create_user(self, username, password=None, email=None):
         if not username:
             raise TypeError("Users must have a username")
 
         user = self.model(
-            username=username,
+            email=email,
+            username=username
         )
 
         user.set_password(password)
@@ -53,8 +54,9 @@ class Users(AbstractBaseUser):
     phone_number = PhoneNumberField(null=True, blank=True, verbose_name="Номер телефона")
     birthplace = models.CharField(max_length=255, blank=True, default="", verbose_name="Место рождения")
     social_status = models.CharField(max_length=255, blank=True, default="", verbose_name="Социальный статус",)
-    receipt_date = models.DateField(null=True)
-    edProgram = models.ForeignKey("oil_grants.EdProgram", on_delete=models.CASCADE, related_name="users", null=True)
+    receipt_date = models.DateField(blank=True, null=True)
+    edProgram = models.ForeignKey("oil_grants.EdProgram", on_delete=models.CASCADE, related_name="users", null=True,
+                                  blank=True)
     gpa = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(4)], default=4)
     image = models.ImageField(upload_to='images/users/avatar', blank=True, null=True, verbose_name="Изображение")
     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
@@ -68,7 +70,7 @@ class Users(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
 
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email', ]
 
     objects = UserManager()
 
@@ -78,7 +80,7 @@ class Users(AbstractBaseUser):
         super(Users, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.username
+        return self.first_name + " " + self.last_name
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
@@ -87,5 +89,4 @@ class Users(AbstractBaseUser):
         return True
 
     class Meta:
-        verbose_name_plural = "Users"
-
+        verbose_name_plural = "Пользователи"

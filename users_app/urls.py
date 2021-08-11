@@ -8,6 +8,8 @@ from django.conf import settings
 urlpatterns = [
     path("main/", Main.as_view(), name="main_url"),
     path("registration/", Registration.as_view(), name="registration_user_url"),
+    path("user/", UserInfoView.as_view(), name="user_info_url"),
+    path("user/update/", UpdateUserView.as_view(), name="update_user_url"),
     path("login/", Login.as_view(), name="log_user_url"),
     path("logout/", Logout.as_view(), name="logout_url"),
     path("recovery/", AccountRecovery.as_view(), name="recovery_url"),
