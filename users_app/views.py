@@ -1,5 +1,3 @@
-import platform
-from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.password_validation import validate_password
 from django.shortcuts import render, redirect, get_object_or_404
@@ -8,20 +6,16 @@ import sys
 from django.contrib.auth import login, authenticate, logout
 from .models import *
 from .forms import *
-from .serializers import *
 import re
-from .permissions import *
 from .utils import *
 from django.core.mail import send_mail
 from django.urls import reverse
-from django.utils.encoding import force_bytes, force_text, DjangoUnicodeDecodeError
+from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from six import text_type
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import *
-from django.http import HttpResponse
-from django.conf import settings
 
 
 class AppTokenGenerator(PasswordResetTokenGenerator):

@@ -1,7 +1,19 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
+from datetime import date
 
 Student = get_user_model()
+
+
+def check_dates(competitions):
+    for competition in competitions:
+        now = date.today()
+        if competition.start <= now:
+            competition.status = "goes on"
+        if competition.end < now:
+            competition.status = "ended"
+        competition.save()
 
 
 class ProgramGroup(models.Model):
@@ -127,6 +139,10 @@ class Competitions(models.Model):
 
     def __str__(self):
         return self.company.name + ", " + self.status
+
+    def clean(self):
+        if self.end <= self.start:
+            raise ValidationError('End date cannot be later than start date')
 
     class Meta:
         verbose_name = "Конкурс"
