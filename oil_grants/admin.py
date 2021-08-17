@@ -25,41 +25,28 @@ class EdProgramAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 
-class OilCompanyAdmin(admin.ModelAdmin):
+class CompanyAdmin(admin.ModelAdmin):
     list_display = ('name', 'address')
     search_fields = ('name', 'address')
     ordering = ('-date_of_update',)
 
 
-class GrantAdmin(admin.ModelAdmin):
-    list_display = ('oilCompany', 'student', 'date')
-    search_fields = ('oilCompany__name', 'student__last_name', 'fee', 'contractNo')
-    list_display_links = ('oilCompany', 'student',)
+class ContractAdmin(admin.ModelAdmin):
+    list_display = ('company', 'student', 'sign_date')
+    search_fields = ('company__name', 'student__last_name', 'fee', 'contractNo')
+    list_display_links = ('company', 'student',)
     readonly_fields = ('id', 'date_of_add', 'date_of_update', )
     ordering = ('-date_of_update',)
     filter_horizontal = ()
-    list_filter = ('oilCompany', )
-    autocomplete_fields = ('oilCompany', 'student')
-    fieldsets = ()
-
-
-class RatingAdmin(admin.ModelAdmin):
-    list_display = ( 'id', 'student', 'essay', 'computerTest', 'ratingDate')
-    list_editable = ('essay', 'computerTest')
-    list_display_links = ('student', 'id',)
-    search_fields = ('student__first_name', 'id',)
-    readonly_fields = ('id', 'date_of_add', 'date_of_update', )
-    autocomplete_fields = ['student', ]
-    ordering = ('-date_of_update',)
-    filter_horizontal = ()
-    list_filter = ()
+    list_filter = ('company', )
+    autocomplete_fields = ('company', 'student')
     fieldsets = ()
 
 
 class CompetitionsAdmin(admin.ModelAdmin):
     list_display = ('id', 'status', 'company', 'start', 'end', 'date_of_add', 'date_of_update', )
     list_display_links = ('company', 'status', 'id',)
-    search_fields = ('company__name', 'id', 'status',)
+    search_fields = ('company__name', 'id', 'status', 'description')
     readonly_fields = ('id', 'date_of_add', 'date_of_update', )
     autocomplete_fields = ['company', ]
     ordering = ('-date_of_update',)
@@ -68,23 +55,23 @@ class CompetitionsAdmin(admin.ModelAdmin):
     fieldsets = ()
 
 
-class ParticipantsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'student', 'is_passed', 'competition', 'date_of_add', 'date_of_update', )
-    list_display_links = ('student', 'is_passed', 'id',)
-    search_fields = ('student__first_name', 'student__last_name', 'id', 'competition__company__name',)
+class ApplicationsAdmin(admin.ModelAdmin):
+    list_display = ('id', 'student', 'competition', 'status', 'essay', 'computerTest', 'submission_date',
+                    'date_of_add', 'date_of_update', )
+    list_display_links = ('student', 'id',)
+    search_fields = ('student__first_name', 'student__last_name', 'id', 'competition__company__name', "description")
     readonly_fields = ('id', 'date_of_add', 'date_of_update', )
     ordering = ('-date_of_update',)
     filter_horizontal = ()
     autocomplete_fields = ['student', 'competition']
-    list_filter = ('student', 'is_passed', 'competition')
+    list_filter = ('student', 'competition')
     fieldsets = ()
 
 
-admin.site.register(Participants, ParticipantsAdmin)
 admin.site.register(Competitions, CompetitionsAdmin)
 admin.site.register(ProgramGroup, ProgramGroupAdmin)
 admin.site.register(EdProgram, EdProgramAdmin)
-admin.site.register(OilCompany, OilCompanyAdmin)
-admin.site.register(Grant, GrantAdmin)
-admin.site.register(Rating, RatingAdmin)
+admin.site.register(Company, CompanyAdmin)
+admin.site.register(Contract, ContractAdmin)
+admin.site.register(Applications, ApplicationsAdmin)
 

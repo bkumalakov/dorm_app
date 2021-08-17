@@ -16,6 +16,9 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from six import text_type
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import *
+from oil_grants.urls import *
+from oil_grants.models import *
+from django.conf import settings
 
 
 class AppTokenGenerator(PasswordResetTokenGenerator):
@@ -69,20 +72,28 @@ def email_verification(request, user, email):
 
 class UserInfoView(LoginRequiredMixin, View):
     def get(self, request,):
-        return render(self.request, 'users_app/user_info.html',)
+        applications = request.user.applications.all()
+        return render(self.request, 'users_app/user_info.html', context={'applications': applications, })
 
 
 class UpdateUserView(LoginRequiredMixin, View):
     def post(self, request):
-
         form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
+
         if form.is_valid():
-            form.save()
+            image = form.cleaned_data.get("image", "")
+            obj = form.save()
+            if image:
+                obj.image = image
+            obj.save()
+
             return redirect('user_info_url')
         return render(self.request, 'users_app/update_user.html', context={'form': form, })
 
     def get(self, request,):
         form = UpdateUserForm(instance=request.user)
+        if request.user.image:
+            form.image = request.user.image
         return render(self.request, 'users_app/update_user.html', context={'form': form, })
 
 
@@ -103,18 +114,21 @@ class Logout(View):
 
 class Registration(View):
     def post(self, request):
-        bound_form = RegistrationForm(request.POST)
+        bound_form = RegistrationForm(request.POST, request.FILES)
         if bound_form.is_valid():
             bound_form.save()
             obj_cleaned = bound_form.cleaned_data.get('email')
             raw_password = bound_form.cleaned_data.get('password1')
+            image = bound_form.cleaned_data.get('image', "")
             authenticate(email_or_phone=obj_cleaned, password=raw_password)
             user = Users.objects.get(email__iexact=obj_cleaned)
+            if image:
+                user.image = image
             user.is_active = False
             user.save()
 
             return render(request, 'users_app/confirm_account.html')
-        return render(request, "users_app/registration.html", context={'form': bound_form, 'errors': bound_form.errors})
+        return render(request, "users_app/index.html", context={'form': bound_form, 'errors': bound_form.errors})
 
     @staticmethod
     def get(request):
@@ -123,7 +137,7 @@ class Registration(View):
             return redirect('main_url')
         form = RegistrationForm()
 
-        return render(request, "users_app/registration.html", context={'form': form})
+        return render(request, "users_app/index.html", context={'form': form})
 
 
 class VerificationView(View):
@@ -155,8 +169,8 @@ class Login(View):
             else:
                 verif = True
 
-            return render(request, 'users_app/Login.html', context={'form_log': bound_form, 'verif': verif})
-        return render(request, 'users_app/Login.html', context={'form_log': bound_form, 'verif': verif,
+            return render(request, 'users_app/component/sign-in.html', context={'form_log': bound_form, 'verif': verif})
+        return render(request, 'users_app/component/sign-in.html', context={'form_log': bound_form, 'verif': verif,
                                                                 'errors': bound_form.errors})
 
     @staticmethod
@@ -166,12 +180,17 @@ class Login(View):
             return redirect('main_url')
         form_log = LogForm()
 
-        return render(request, 'users_app/Login.html', context={'form_log': form_log})
+        return render(request, 'users_app/component/sign-in.html', context={'form_log': form_log})
 
 
 class AccountRecovery(View):
     @staticmethod
     def post(request):
+
+        if (settings.EMAIL_HOST_USER == "" or settings.EMAIL_HOST_PASSWORD == "") and settings.DEBUG:
+            raise Exception("Пожалуйста добавьте настройте почтовые данные в файле settings.py"
+                            " - EMAIL_HOST_USER и EMAIL_HOST_PASSWORD")
+
         email = request.POST.get("email")
         email = str(email).strip()
 
@@ -185,7 +204,6 @@ class AccountRecovery(View):
         domain = get_current_site(request).domain
         link = reverse('restore_url', kwargs={'uidb64': uidb64, 'token': token})
         recovery_url = 'http://' + domain + link
-        print(recovery_url)
         send_mail(
             'Restore your password',
             'Please click on link to change your password \n' + recovery_url,
@@ -193,12 +211,11 @@ class AccountRecovery(View):
             [email],
             fail_silently=False,
         )
-
-        return redirect('main_url')
+        return redirect('log_user_url')
 
     @staticmethod
     def get(request):
-        return render(request, 'users_app/password_recovery.html')
+        return render(request, 'users_app/component/restore.html')
 
 
 class PasswordRestore(View):
@@ -242,3 +259,34 @@ class PasswordRestore(View):
                                                                         'uidb64': uidb64,
                                                                         'token': token,
                                                                         })
+
+
+class PasswordUpdateView(LoginRequiredMixin, View):
+    def post(self, request):
+        bound_form = PasswordUpdateForm(request.POST)
+        if bound_form.is_valid():
+            old_password = bound_form.cleaned_data.get('old_password')
+            new_password1 = bound_form.cleaned_data.get('new_password1')
+            new_password2 = bound_form.cleaned_data.get('new_password2')
+            if authenticate(username=request.user.username, password=old_password):
+                if new_password1 == new_password2:
+                    try:
+                        validate_password(new_password1)
+                        is_valid = True
+                    except ValidationError as e:
+                        return render(request, 'users_app/password_update.html', context={'form': bound_form,
+                                                                                          'error': e, })
+                    if is_valid:
+                        request.user.set_password(new_password1)
+                        request.user.save()
+                        return redirect('log_user_url')
+                return render(request, 'users_app/password_update.html', context={'form': bound_form,
+                                                                                  'error': "Passwords didn't match"})
+            else:
+                return render(request, "users_app/password_update.html",
+                       context={'form': bound_form, 'error': "Wrong old password"})
+        return render(request, "users_app/password_update.html", context={'form': bound_form, 'error': bound_form.errors})
+
+    def get(self, request):
+        form = PasswordUpdateForm()
+        return render(request, 'users_app/password_update.html', context={'form': form, })

@@ -3,18 +3,44 @@
     Home
 {% endblock %}
 
+{% block auth %}
+    <div>
+        {% if not request.user.is_authenticated %}
+             <div id="log">
+                <a href="{% url 'log_user_url' %}">Sign in</a>
+            </div>
+            {% else %}
+            <div id="logout">
+                <a href="{% url 'logout_url' %}">Logout</a>
+            </div>
+        {% endif %}
 
-{% block content %}
+    </div>
+{% endblock %}
 
+{% block user %}
+    <div id="user-info" style="margin: 50px;">
+        <a href="{% url 'user_info_url' %}">
+            <div style="margin-left: 40px;">
+                <img  {% if user.image %} src="{{ user.image.url }}" {% else %}  src="#" {% endif %} alt="" style="border-radius: 100px; width: 50px; height: 50px;">
+            </div>
+            <div>
+                {{ user.first_name }} - {{ user.last_name }}
+            </div>
+        </a>
+    </div>
+{% endblock %}
+
+{% block competitions %}
     <div style="margin-left: 10px; border: 2px black solid; width: 500px;">
         {% for competition in competitions %}
             <div style="width: 400px; border: black solid 2px; margin: 50px;">
-                    <p>{{ competition.company.name }}</p>
+                    <a href="{% url "competition_detail_url" id=competition.id %}">
+                        <p>{{ competition.company.name }}</p>
+                    </a>
                     <p>{{ competition.start }} - {{ competition.end }}</p>
                     <p>{{ competition.get_status_display }}</p>
-
             </div>
         {% endfor %}
     </div>
-
 {% endblock %}

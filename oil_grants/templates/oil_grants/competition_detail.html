@@ -1,0 +1,31 @@
+{% extends "oil_grants/base.html" %}
+
+{% block content %}
+    <div style="width: 400px; border: black solid 2px; margin: 50px;">
+        <p>Название компании спонсора: {{ competition.company.name }}</p>
+        <p>
+            <p>Описание компании спонсора: {{ competition.company.description }}</p>
+            <p>Контактные данные спонсора: {{ competition.company.contact_num }}</p>
+            <p>Адрес спонсора: {{ competition.company.address }}</p>
+        </p>
+
+        <p>Продолжительность: {{ competition.start }} - {{ competition.end }}</p>
+        <p>Статус: {{ competition.get_status_display }}</p>
+        <p>Описание: {{ competition.description }}</p>
+
+        {% if not application %}
+            {% if competition.status != "ended" and competition.status != "didn't start" %}
+                <form action="{% url 'competition_detail_url' id=competition.id%}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Оставить заявку на участие!</button>
+                </form>
+            {% elif competition.status == "didn't start" %}
+              <p><strong>Конкурс не начался!</strong></p>
+            {% else %}
+                 <p><strong>Конкурс завершен: {{ competition.end }}</strong></p>
+            {% endif %}
+        {% else %}
+            <p><strong>Заявка отправлена</strong></p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -8,6 +10,18 @@
     </title>
     </head>
     <body>
+
+        {% block auth %}
+        {% endblock %}
+
+        {% if request.user.is_authenticated %}
+            {% block user %}
+            {% endblock %}
+        {% endif %}
+
+        {% block competitions %}
+        {% endblock %}
+
         {% block header %}
         {% endblock %}
 

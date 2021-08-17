@@ -54,10 +54,9 @@ class Users(AbstractBaseUser):
     phone_number = PhoneNumberField(null=True, blank=True, verbose_name="Номер телефона")
     birthplace = models.CharField(max_length=255, blank=True, default="", verbose_name="Место рождения")
     social_status = models.CharField(max_length=255, blank=True, default="", verbose_name="Социальный статус",)
-    receipt_date = models.DateField(blank=True, null=True)
-    edProgram = models.ForeignKey("oil_grants.EdProgram", on_delete=models.CASCADE, related_name="users", null=True,
-                                  blank=True)
-    gpa = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(4)], default=4)
+    receipt_date = models.DateField(null=True, )
+    edProgram = models.ForeignKey("oil_grants.EdProgram", on_delete=models.CASCADE, related_name="users", null=True,)
+    gpa = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(4)], null=True,)
     image = models.ImageField(upload_to='images/users/avatar', blank=True, null=True, verbose_name="Изображение")
     date_joined = models.DateTimeField(verbose_name='date_joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last_login', auto_now=True)
@@ -90,3 +89,4 @@ class Users(AbstractBaseUser):
 
     class Meta:
         verbose_name_plural = "Пользователи"
+        verbose_name = "Пользователь"

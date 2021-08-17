@@ -1,9 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
+
 from .models import Users
 from phonenumber_field.formfields import PhoneNumberField
 from django.contrib.auth import authenticate
-
+from oil_grants.models import EdProgram
 
 class UpdateUserForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username'}),
@@ -12,7 +14,7 @@ class UpdateUserForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Имя'}),
                                  label="Имя*", required=True)
 
-    image = forms.ImageField(required=False)
+    # image = forms.ImageField(required=False)
 
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}),
                                 label="Фамилия*", required=True)
@@ -42,7 +44,7 @@ class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Имя'}),
                                  label="Имя*", required=True)
 
-    image = forms.ImageField(required=False)
+    # image = forms.ImageField(required=False)
 
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}),
                                 label="Фамилия*", required=True)
@@ -63,27 +65,30 @@ class RegistrationForm(UserCreationForm):
                                     label="Телефон*", required=True)
 
     birthplace = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Место рождения'}),
-                               label="Место рождения", required=False)
+                                 label="Место рождения", required=False)
 
     social_status = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Социальный статус'}),
-                               label="Социальный статус", required=False)
+                                    label="Социальный статус", required=False)
 
     password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Пароль'}), label="Пароль")
 
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Подтверждение пароля'}),
                                 label="Подтверждение пароля")
 
+    edProgram = forms.ModelChoiceField(widget=forms.Select(attrs={'style': 'width: 300px; height: 45px;'}),
+                                       queryset=EdProgram.objects.all())
+
     class Meta:
         model = Users
         fields = ['first_name', 'last_name', 'patronymic', 'uin', 'birthplace', 'social_status', 'email', 'phone_number',
-                  'username', 'password1', 'password2']
+                  'edProgram', 'username', 'password1', 'password2']
 
 
 class LogForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username'}),
-                               label="Username", required=True)
+                               label="Логин", required=True)
 
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), label="Password",
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), label="Пароль",
                                required=True)
 
     class Meta:
@@ -96,3 +101,19 @@ class LogForm(forms.ModelForm):
 
         if not authenticate(username=username, password=password):
             raise forms.ValidationError("Invalid login")
+
+
+class PasswordUpdateForm(forms.ModelForm):
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'old_password'}),
+                                   label="Old password",
+                                   required=True)
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'new_password1'}),
+                                    label="New password",
+                                    required=True)
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'new_password2'}),
+                                    label="Confirm password",
+                                    required=True)
+
+    class Meta:
+        model = Users
+        fields = ['old_password', 'new_password1', 'new_password2']

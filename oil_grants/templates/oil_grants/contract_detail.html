@@ -1,0 +1,31 @@
+{% extends "oil_grants/base.html" %}
+
+{% block content %}
+    <h1>
+        Договор №{{ contract.contractNo }}
+    </h1>
+
+    <p>
+        Компания: {{ contract.company }}
+    </p>
+
+    <p>
+        Студент: {{ contract.student.first_name }} {{ contract.student.last_name }}
+    </p>
+
+    <p>
+        Дата заключения: {{ contract.sign_date|date:"d.m.y" }}
+    </p>
+
+    <p>
+        Период оплаты учебы: {{ contract.get_duration_display }}
+    </p>
+
+    <p>
+        Сумма гранта: {{ contract.fee }}
+    </p>
+
+    <p>
+        Номер договора: {{ contract.contractNo }}
+    </p>
+{% endblock %}

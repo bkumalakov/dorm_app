@@ -1,0 +1,20 @@
+{% extends "oil_grants/base.html" %}
+
+{% block content %}
+    <h1>
+        Вы действительно хотите оставить заявку на конкурс {{ competition }}?
+    </h1>
+
+    <form action="{% url 'add_application_url' id=competition.id%}" method="post">
+                {% csrf_token %}
+
+        <p>
+            <button type="submit" name="yes" value="True"> Да </button>
+        </p>
+
+        <p>
+            <button type="submit" name="no" value="False"> Нет </button>
+        </p>
+    </form>
+
+{% endblock %}

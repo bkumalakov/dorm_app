@@ -1,72 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>User info</title>
-</head>
-<body>
+{% extends 'oil_grants/base.html' %}
+
+{% block content %}
+
     <h1> Личный кабинет </h1>
 
-    <p>
-        Здравствуйте, {{ request.user.username }}
-    </p>
+    <div style="display: flex;">
+        <div id="personal_info">
+            <p>
+                Здравствуйте, {{ request.user.username }}
+            </p>
 
-    {% if  request.user.image   %}
+            {% if  request.user.image   %}
 
-        <p>
-            <img src="{{ request.user.image }}" alt="Изображение не доступно">
-        </p>
+                <p>
+                    <img src="{{ request.user.image.url }}" style="width: 100px; height: 100px;" alt="Изображение не доступно">
+                </p>
 
-    {% endif %}
-    <p>
-        Имя: {{ request.user.first_name }}
-    </p>
+            {% endif %}
+            <p>
+                Имя: {{ request.user.first_name }}
+            </p>
 
-    <p>
-        Фамилия: {{ request.user.last_name }}
-    </p>
+            <p>
+                Фамилия: {{ request.user.last_name }}
+            </p>
 
-    <p>
-        Отчество: {{ request.user.patronymic }}
-    </p>
+            <p>
+                Отчество: {{ request.user.patronymic }}
+            </p>
 
-    <p>
-        Email: {{ request.user.email }}
-    </p>
+            <p>
+                Email: {{ request.user.email }}
+            </p>
 
-    <p>
-        ИИН: {{ request.user.uin }}
-    </p>
+            <p>
+                ИИН: {{ request.user.uin }}
+            </p>
 
-    <p>
-        Статус: {{ request.user.status }}
-    </p>
+            <p>
+                Статус: {{ request.user.status }}
+            </p>
 
-    <p>
-        Место рождения: {{ request.user.birthplace }}
-    </p>
+            <p>
+                Место рождения: {{ request.user.birthplace }}
+            </p>
 
-     {% if request.user.receipt_date %}
-        <p>
-            Дата поступления: {{ request.user.receipt_date }}
-        </p>
-     {% endif %}
+             {% if request.user.receipt_date %}
+                <p>
+                    Дата поступления: {{ request.user.receipt_date }}
+                </p>
+             {% endif %}
 
-    <p>
-        GPA: {{ request.user.gpa }}
-    </p>
+            <p>
+                GPA: {{ request.user.gpa }}
+            </p>
 
-    {% if request.user.edProgram %}
+            {% if request.user.edProgram %}
 
-        <p>
-            Образовательная программа: {{ request.user.edProgram.p_name }}
-        </p>
+                <p>
+                    Образовательная программа: {{ request.user.edProgram.p_name }}
+                </p>
 
-    {% endif %}
+            {% endif %}
+            <p>
+                <a href="{% url 'update_user_url' %}">Редактировать</a>
+            </p>
 
-    <p>
-        <a href="{% url 'update_user_url' %}">Редактировать</a>
-    </p>
+            <p>
+                <a href="{% url 'password_update' %}">Обновить пароль</a>
+            </p>
+        </div>
 
-</body>
-</html>
+        <div id="applications" style="margin-left: 100px;">
+            <table border="1" cellpadding="10">
+               <caption>Ваши заявления</caption>
+               <tr>
+                    <th>Конкурс</th>
+                    <th>Статус</th>
+                    <th>Договор</th>
+                    <th>Балл за эссе</th>
+                    <th>Балл за компьютерный тест</th>
+                    <th>Дата подачи</th>
+                    <th>Дата окончания конкурса</th>
+               </tr>
+                {% for application in applications %}
+                     <tr>
+                        <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
+                        <th>{{ application.get_status_display }}</th>
+
+                        <th>
+                            {% if application.contract %}
+                                <a href="{% url "contract_detail_url" id=application.contract.id %}"> {{ application.contract.contractNo }} </a>
+                            {% else %}
+                                Нет договора
+                            {% endif %}
+                        </th>
+
+                        <th>{% if application.essay %} {{ application.essay }} {% else%} {% endif %}</th>
+                        <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
+                        <th>{{ application.submission_date|date:"d.m.y" }}</th>
+                        <th>{{ application.competition.end|date:"d.m.y" }}</th>
+                     </tr>
+                {% endfor %}
+
+              </table>
+        </div>
+    </div>
+{% endblock %}

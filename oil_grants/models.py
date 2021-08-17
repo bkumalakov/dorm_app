@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import date
+from phonenumber_field.modelfields import PhoneNumberField
 
 Student = get_user_model()
 
@@ -37,7 +38,7 @@ class EdProgram(models.Model):
         ('PhD', 'PhD'),
     )
 
-    p_name = models.CharField(max_length=150, verbose_name="Наименование ОП")
+    p_name = models.CharField(max_length=255, verbose_name="Наименование ОП")
     p_code = models.CharField(max_length=8, verbose_name="Код ОП")
     p_degreeLevel = models.CharField(max_length=3, choices=DEGREE_TYPES, verbose_name="Уровень обучения")
     group = models.ForeignKey(ProgramGroup, on_delete=models.CASCADE)
@@ -52,25 +53,11 @@ class EdProgram(models.Model):
         verbose_name = 'Образовательная программа'
 
 
-class Rating(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="rating",  verbose_name='Обучающийся')
-    essay = models.IntegerField(verbose_name='Балл за эссе', blank=True, null=True)
-    computerTest = models.IntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
-    ratingDate = models.DateField(verbose_name='Дата составления рейтинга')
-    date_of_update = models.DateTimeField(auto_now=True, editable=False)
-    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
-
-    def __str__(self):
-        return "Обучающийся: " + ' ' + self.student.first_name + ' ' + self.student.last_name + " (" + self.ratingDate.strftime("%m/%d/%Y") + ")"
-
-    class Meta:
-        verbose_name_plural = 'Рейтинги обучающихся'
-        verbose_name = 'Рейтинг обучающихся'
-
-
-class OilCompany(models.Model):
-    name = models.CharField(max_length=50, verbose_name="Наименование")
-    address = models.CharField(max_length=50, verbose_name="Адрес")
+class Company(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Наименование")
+    address = models.CharField(max_length=255, verbose_name="Адрес")
+    contact_num = PhoneNumberField(null=True, blank=True, verbose_name="Контактный номер")
+    description = models.TextField(verbose_name="Описание", blank=True)
     date_of_update = models.DateTimeField(auto_now=True, editable=False)
     date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
 
@@ -82,46 +69,6 @@ class OilCompany(models.Model):
         verbose_name = 'Компания недропользователь'
 
 
-class Grant(models.Model):
-    DURATION_TYPES = (
-        ('YR', 'Год'),
-        ('SM', 'Семестр')
-    )
-
-    oilCompany = models.ForeignKey(OilCompany, on_delete=models.CASCADE, verbose_name="Компания недропользователь")
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Обучающийся")
-    date = models.DateField(verbose_name="Дата присвоения")
-    duration = models.CharField(max_length=3, choices=DURATION_TYPES, verbose_name="Период оплаты")
-    fee = models.IntegerField(verbose_name="Сумма гранта")
-    contractNo = models.CharField(max_length=15, verbose_name="Номер договора")
-    date_of_update = models.DateTimeField(auto_now=True, editable=False)
-    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
-
-    def __str__(self):
-        return self.contractNo
-
-    class Meta:
-        verbose_name_plural = 'Списки присвоенных грантов'
-        verbose_name = 'Присвоенный грант'
-
-
-class Participants(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="applications",
-                                verbose_name="Учащийся")
-    is_passed = models.BooleanField(default=False, verbose_name="Прошел конкурс")
-    competition = models.ForeignKey('Competitions', on_delete=models.CASCADE, related_name="participants",
-                                    verbose_name="Конкурс")
-    date_of_update = models.DateTimeField(auto_now=True, editable=False)
-    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
-
-    def __str__(self):
-        return self.student.first_name + " " + self.student.last_name + " " + str(self.is_passed)
-
-    class Meta:
-        verbose_name = "Заявка на конкурс"
-        verbose_name_plural = "Заявки на конкурсы"
-
-
 class Competitions(models.Model):
     CHOICES = (
         ("didn't start", "Не начался"),
@@ -129,13 +76,14 @@ class Competitions(models.Model):
         ("ended", "Завершился"),
     )
 
-    start = models.DateField(verbose_name="Дата начала конкурса")
-    end = models.DateField(verbose_name="Дата Завершения конкурс")
+    start = models.DateField(verbose_name="Дата начала приема заявок")
+    end = models.DateField(verbose_name="Дата начала приема заявок")
+    description = models.TextField(verbose_name="Описание", blank=True, default="")
     status = models.CharField(choices=CHOICES, max_length=15, default="didn't start", verbose_name="Статус")
-    company = models.ForeignKey(OilCompany, related_name="competitions", on_delete=models.CASCADE,
-                                verbose_name="Компания недропользователь")
+    company = models.ForeignKey(Company, related_name="competitions", on_delete=models.CASCADE,
+                                verbose_name="Компания недропользователь", blank=True, null=True)
     date_of_update = models.DateTimeField(auto_now=True, editable=False)
-    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False, verbose_name="Дата выхода объявления")
 
     def __str__(self):
         return self.company.name + ", " + self.status
@@ -147,3 +95,51 @@ class Competitions(models.Model):
     class Meta:
         verbose_name = "Конкурс"
         verbose_name_plural = "Конкурсы"
+
+
+class Applications(models.Model):
+    STATUS_TYPES = (
+        ('REC', 'Получена'),
+        ('REV', 'Рассматривается'),
+        ('RET', 'Отправлена на доработку'),
+        ('ACC', 'Одобрена'),
+        ('REJ', 'Отклонена'),
+    )
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="applications")
+    competition = models.ForeignKey('Competitions', on_delete=models.CASCADE, related_name="applications")
+    submission_date = models.DateField(verbose_name="Дата подачи заявки", auto_now_add=True)
+    essay = models.PositiveIntegerField(verbose_name='Балл за эссе', blank=True, null=True)
+    computerTest = models.PositiveIntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
+    status = models.CharField(max_length=3, choices=STATUS_TYPES, verbose_name="Статус заявки", default="REC")
+    description = models.CharField(max_length=1500, verbose_name="Описание", blank=True, default="")
+    contract = models.ForeignKey('Contract', on_delete=models.CASCADE, related_name="applications", blank=True, null=True)
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+
+    class Meta:
+        verbose_name_plural = 'Заявки на конкурсы'
+        verbose_name = 'Заявка на конкурс'
+
+
+class Contract(models.Model):
+    DURATION_TYPES = (
+        ('YR', 'Год'),
+        ('SM', 'Семестр')
+    )
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name="Компания спонсор")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Обучающийся")
+    sign_date = models.DateField(verbose_name="Дата заключения")
+    duration = models.CharField(max_length=3, choices=DURATION_TYPES, verbose_name="Период оплаты учебы")
+    fee = models.IntegerField(verbose_name="Сумма гранта")
+    contractNo = models.CharField(max_length=15, verbose_name="Номер договора")
+    date_of_update = models.DateTimeField(auto_now=True, editable=False)
+    date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        return self.contractNo
+
+    class Meta:
+        verbose_name_plural = 'Списки присвоенных грантов'
+        verbose_name = 'Присвоенный грант'
