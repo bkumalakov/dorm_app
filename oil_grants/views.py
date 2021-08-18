@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponseNotFound
 from django.views import View
+from django.db.models import Q
 from .models import *
 
 
@@ -17,7 +18,12 @@ class MainView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def get(self, request):
-        competitions = Competitions.objects.all()
+        search_query = request.GET.get('search', '')
+        if search_query:
+            competitions = Competitions.objects.filter(Q(description__icontains=search_query) | Q(company__description__icontains=search_query) | Q(company__name__icontains=search_query))
+        else:
+            competitions = Competitions.objects.all()
+
         check_dates(competitions)
         return render(self.request, "oil_grants/home.html", context={'competitions': competitions, })
 

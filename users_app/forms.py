@@ -104,14 +104,14 @@ class LogForm(forms.ModelForm):
 
 
 class PasswordUpdateForm(forms.ModelForm):
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'old_password'}),
-                                   label="Old password",
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'старый пароль'}),
+                                   label="Старый пароль",
                                    required=True)
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'new_password1'}),
-                                    label="New password",
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'новый пароль'}),
+                                    label="Новый пароль",
                                     required=True)
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'new_password2'}),
-                                    label="Confirm password",
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'подтвердите пароль'}),
+                                    label="Подтвердите пароль",
                                     required=True)
 
     class Meta:

@@ -3,6 +3,7 @@
     Home
 {% endblock %}
 
+
 {% block auth %}
     <div>
         {% if not request.user.is_authenticated %}
@@ -43,4 +44,13 @@
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+
+{% block content %}
+      <form class="d-flex ml-5" method="get" action="{% url 'main_url' %}">
+            {% csrf_token %}
+            <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success ml-2" type="submit">Search</button>
+      </form>
 {% endblock %}
