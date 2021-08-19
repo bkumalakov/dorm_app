@@ -7,31 +7,32 @@ from phonenumber_field.formfields import PhoneNumberField
 from django.contrib.auth import authenticate
 from oil_grants.models import EdProgram
 
+
 class UpdateUserForm(forms.ModelForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username'}),
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username', 'class': 'form-control'}),
                                label="Username", required=True)
 
-    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Имя'}),
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Имя', 'class': 'form-control'}),
                                  label="Имя*", required=True)
 
     # image = forms.ImageField(required=False)
 
-    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Фамилия'}),
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Фамилия', 'class': 'form-control'}),
                                 label="Фамилия*", required=True)
 
-    patronymic = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Отчество'}),
+    patronymic = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Отчество', 'class': 'form-control'}),
                                  label="Отчество", required=False)
 
-    email = forms.EmailField(widget=forms.TextInput(attrs={'placeholder': 'Email адрес'}),
+    email = forms.EmailField(widget=forms.TextInput(attrs={'placeholder': 'Email адрес', 'class': 'form-control'}),
                              label="Email адрес*", required=True)
 
-    phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'placeholder': 'Телефон'}),
+    phone_number = PhoneNumberField(widget=forms.TextInput(attrs={'placeholder': 'Телефон', 'class': 'form-control'}),
                                     label="Телефон*", required=True)
 
-    birthplace = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Место рождения'}),
+    birthplace = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Место рождения', 'class': 'form-control'}),
                                  label="Место рождения", required=False)
 
-    social_status = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Социальный статус'}),
+    social_status = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Социальный статус', 'class': 'form-control'}),
                                     label="Социальный статус", required=False)
 
     class Meta:
@@ -85,10 +86,10 @@ class RegistrationForm(UserCreationForm):
 
 
 class LogForm(forms.ModelForm):
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'username'}),
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'логин'}),
                                label="Логин", required=True)
 
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), label="Пароль",
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'пароль'}), label="Пароль",
                                required=True)
 
     class Meta:
@@ -104,13 +105,13 @@ class LogForm(forms.ModelForm):
 
 
 class PasswordUpdateForm(forms.ModelForm):
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'старый пароль'}),
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'старый пароль', 'class': 'form-control'}),
                                    label="Старый пароль",
                                    required=True)
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'новый пароль'}),
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'новый пароль', 'class': 'form-control'}),
                                     label="Новый пароль",
                                     required=True)
-    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'подтвердите пароль'}),
+    new_password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'подтвердите пароль', 'class': 'form-control'}),
                                     label="Подтвердите пароль",
                                     required=True)
 

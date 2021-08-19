@@ -1,0 +1,167 @@
+{% extends 'oil_grants/base.html' %}
+
+{% block title %}
+    Конкурс {{ competition.competition_number }}
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+              <div class="d-flex justify-content-center">
+                <div class="col-md-8">
+                    <div class="text-center">
+                        <h2>Информация о конкурсе №{{ competition.competition_number }} </h2>
+                    </div>
+                  <div class="card mb-3">
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Название компании спонсора: </h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.company.name }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Описании компаний спонсора</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.company.description }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Контактные данные спонсора:</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.company.contact_num }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Адрес спонсора:</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.company.address }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Продолжительность:</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.start }} - {{ competition.end }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Статус:</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                            {{ competition.get_status_display }}
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <h6 class="mb-2">Описание:</h6>
+                        </div>
+                        <div class="col-sm-8 text-secondary">
+                          {{ competition.description }}
+                        </div>
+                      </div>
+                      <hr>
+                        {% if competition.status == 'goes on' and not application%}
+                              <div class="text-center">
+                                    <button class="btn btn-outline-primary me-md-4" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"> Оставить заявку </button>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Вы хотите оставить заявку на конкурс № {{ competition.competition_number }}?
+                                            </div>
+                                            <div>
+
+                                                    <form action="{% url 'add_application_url' id=competition.id%}" method="post">
+                                                        {% csrf_token %}
+                                                            <div style="margin-left: 80px; margin-bottom: 10px;">
+                                                            <script src='https://www.google.com/recaptcha/api.js'></script>
+                                                            <div class="form-group g-recaptcha" data-sitekey="6Lf2YAscAAAAAFnQGZThKyf0Nq9VS6lG31Xe-P1B"></div>
+                                                            {% if messages %}
+                                                                {% for message in messages %}
+                                                                    {{ message }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            </div>
+                                                        <button type="button" class="btn btn-outline-primary mb-2" data-bs-dismiss="modal">Отмена</button>
+                                                        <button class="btn btn-outline-primary mb-2"  type="submit" name="yes" value="True">Да</button>
+                                                    </form>
+
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                              </div>
+                        {% elif application%}
+                          <div class="text-center">
+                                <button class="btn btn-outline-primary me-md-4 active" type="button" > Вы оформили заявление </button>
+                              <button class="btn btn-outline-danger me-md-4" type="submit" data-bs-toggle="modal" data-bs-target="#exampleModal"> Отменить заявление </button>
+                               <!-- Modal -->
+                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Вы хотите отменить заявление на конкурс № {{ competition.competition_number }}?
+                                            </div>
+                                            <div>
+
+                                                    <form action="{% url 'delete_application_url' id=application.id%}" method="post">
+                                                        {% csrf_token %}
+                                                            <div style="margin-left: 80px; margin-bottom: 10px;">
+                                                            <script src='https://www.google.com/recaptcha/api.js'></script>
+                                                            <div class="form-group g-recaptcha" data-sitekey="6Lf2YAscAAAAAFnQGZThKyf0Nq9VS6lG31Xe-P1B"></div>
+                                                            {% if messages %}
+                                                                {% for message in messages %}
+                                                                    {{ message }}
+                                                                {% endfor %}
+                                                            {% endif %}
+                                                            </div>
+                                                        <button type="button" class="btn btn-outline-primary mb-2" data-bs-dismiss="modal">Отмена</button>
+                                                        <button class="btn btn-outline-primary mb-2" type="submit" name="yes" value="True"> Да </button>
+                                                    </form>
+
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                          </div>
+                        {% elif competition.status == "didn't start" %}
+                            <div class="text-center">
+                                <button class="btn btn-outline-primary me-md-4 active" type="button" > Конкурс не начался </button>
+                            </div>
+                        {% elif competition.status == "ended" %}
+                            <div class="text-center">
+                                <button class="btn btn-outline-primary me-md-4 active" type="button" > Конкурс завершился </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </div>
+  {% endblock %}

@@ -1,9 +1,9 @@
+import random
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
 from datetime import date
 from phonenumber_field.modelfields import PhoneNumberField
-
 Student = get_user_model()
 
 
@@ -69,6 +69,16 @@ class Company(models.Model):
         verbose_name = 'Компания недропользователь'
 
 
+class UsedCompetitionNumbers(models.Model):
+    competition_number = models.CharField(max_length=14)
+
+    def __str__(self):
+        return '{}'.format(self.competition_number)
+
+    class Meta:
+        verbose_name_plural = "Использованные номера конкурсов"
+
+
 class Competitions(models.Model):
     CHOICES = (
         ("didn't start", "Не начался"),
@@ -78,6 +88,7 @@ class Competitions(models.Model):
 
     start = models.DateField(verbose_name="Дата начала приема заявок")
     end = models.DateField(verbose_name="Дата начала приема заявок")
+    competition_number = models.CharField(max_length=20, blank=True, unique=True)
     description = models.TextField(verbose_name="Описание", blank=True, default="")
     status = models.CharField(choices=CHOICES, max_length=15, default="didn't start", verbose_name="Статус")
     company = models.ForeignKey(Company, related_name="competitions", on_delete=models.CASCADE,
@@ -88,6 +99,31 @@ class Competitions(models.Model):
     def __str__(self):
         return self.company.name + ", " + self.status
 
+    @staticmethod
+    def set_competition_number():
+        ids = UsedCompetitionNumbers.objects.all()
+        used_ids = []
+        for id in ids:
+            used_ids.append(id.competition_number)
+        while True:
+            id = str(random.randint(100000000, 999999999))
+            if id not in used_ids:
+                UsedCompetitionNumbers.objects.create(competition_number=id)
+                return id
+
+    def save(self, *args, **kwargs):
+        now = date.today()
+        if self.start <= now:
+            self.status = "goes on"
+        if self.end < now:
+            self.status = "ended"
+        if not self.id:
+            if not self.competition_number:
+                self.competition_number = self.set_competition_number()
+            else:
+                UsedCompetitionNumbers.objects.create(competition_number=self.competition_number)
+        super(Competitions, self).save(*args, **kwargs)
+
     def clean(self):
         if self.end <= self.start:
             raise ValidationError('End date cannot be later than start date')
@@ -95,6 +131,7 @@ class Competitions(models.Model):
     class Meta:
         verbose_name = "Конкурс"
         verbose_name_plural = "Конкурсы"
+        ordering = ["-date_of_add"]
 
 
 class Applications(models.Model):
@@ -113,9 +150,17 @@ class Applications(models.Model):
     computerTest = models.PositiveIntegerField(verbose_name='Балл компьютерного теста', blank=True, null=True)
     status = models.CharField(max_length=3, choices=STATUS_TYPES, verbose_name="Статус заявки", default="REC")
     description = models.CharField(max_length=1500, verbose_name="Описание", blank=True, default="")
-    contract = models.ForeignKey('Contract', on_delete=models.CASCADE, related_name="applications", blank=True, null=True)
+    contract = models.OneToOneField('Contract', on_delete=models.CASCADE, related_name="application", blank=True, null=True)
     date_of_update = models.DateTimeField(auto_now=True, editable=False)
     date_of_add = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        if self.id:
+            if self.contract:
+                self.contract.company = self.competition.company
+                self.contract.student = self.student
+                self.contract.save()
+        super(Applications, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = 'Заявки на конкурсы'
@@ -128,8 +173,8 @@ class Contract(models.Model):
         ('SM', 'Семестр')
     )
 
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name="Компания спонсор")
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Обучающийся")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, verbose_name="Компания спонсор", blank=True, null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, verbose_name="Обучающийся",  blank=True, null=True)
     sign_date = models.DateField(verbose_name="Дата заключения")
     duration = models.CharField(max_length=3, choices=DURATION_TYPES, verbose_name="Период оплаты учебы")
     fee = models.IntegerField(verbose_name="Сумма гранта")

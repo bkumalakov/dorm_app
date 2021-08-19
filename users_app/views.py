@@ -74,8 +74,7 @@ class UserInfoView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def get(self, request,):
-        applications = request.user.applications.all()
-        return render(self.request, 'users_app/user_info.html', context={'applications': applications, })
+        return render(self.request, 'oil_grants/pages/information.html', )
 
 
 class UpdateUserView(LoginRequiredMixin, View):
@@ -92,13 +91,11 @@ class UpdateUserView(LoginRequiredMixin, View):
             obj.save()
 
             return redirect('user_info_url')
-        return render(self.request, 'users_app/update_user.html', context={'form': form, })
+        return render(self.request, 'oil_grants/pages/edit.html', context={'form': form, })
 
-    def get(self, request,):
+    def get(self, request):
         form = UpdateUserForm(instance=request.user)
-        if request.user.image:
-            form.image = request.user.image
-        return render(self.request, 'users_app/update_user.html', context={'form': form, })
+        return render(self.request, 'oil_grants/pages/edit.html', context={'form': form, })
 
 
 class Main(View):
@@ -213,7 +210,6 @@ class AccountRecovery(View):
         domain = get_current_site(request).domain
         link = reverse('restore_url', kwargs={'uidb64': uidb64, 'token': token})
         recovery_url = 'http://' + domain + link
-        print(recovery_url)
         send_mail(
             'Restore your password',
             'Please click on link to change your password \n' + recovery_url,
@@ -285,19 +281,19 @@ class PasswordUpdateView(LoginRequiredMixin, View):
                         validate_password(new_password1)
                         is_valid = True
                     except ValidationError as e:
-                        return render(request, 'users_app/password_update.html', context={'form': bound_form,
+                        return render(request, '../../oil_grants/templates/oil_grants/pages/change-password.html', context={'form': bound_form,
                                                                                           'error': e, })
                     if is_valid:
                         request.user.set_password(new_password1)
                         request.user.save()
                         return redirect('log_user_url')
-                return render(request, 'users_app/password_update.html', context={'form': bound_form,
+                return render(request, '../../oil_grants/templates/oil_grants/pages/change-password.html', context={'form': bound_form,
                                                                                   'error': "Passwords didn't match"})
             else:
-                return render(request, "users_app/password_update.html",
+                return render(request, "../../oil_grants/templates/oil_grants/pages/change-password.html",
                        context={'form': bound_form, 'error': "Wrong old password"})
-        return render(request, "users_app/password_update.html", context={'form': bound_form, 'error': bound_form.errors})
+        return render(request, "../../oil_grants/templates/oil_grants/pages/change-password.html", context={'form': bound_form, 'error': bound_form.errors})
 
     def get(self, request):
         form = PasswordUpdateForm()
-        return render(request, 'users_app/password_update.html', context={'form': form, })
+        return render(request, '../../oil_grants/templates/oil_grants/pages/change-password.html', context={'form': form, })

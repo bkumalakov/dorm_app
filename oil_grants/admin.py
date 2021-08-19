@@ -35,7 +35,7 @@ class ContractAdmin(admin.ModelAdmin):
     list_display = ('company', 'student', 'sign_date')
     search_fields = ('company__name', 'student__last_name', 'fee', 'contractNo')
     list_display_links = ('company', 'student',)
-    readonly_fields = ('id', 'date_of_add', 'date_of_update', )
+    readonly_fields = ('id', 'date_of_add', 'date_of_update', 'company', 'student')
     ordering = ('-date_of_update',)
     filter_horizontal = ()
     list_filter = ('company', )

@@ -71,41 +71,46 @@
             </p>
         </div>
 
-        <div id="applications" style="margin-left: 100px;">
-            <table border="1" cellpadding="10">
-               <caption>Ваши заявления</caption>
-               <tr>
-                    <th>Конкурс</th>
-                    <th>Статус</th>
-                    <th>Договор</th>
-                    <th>Балл за эссе</th>
-                    <th>Балл за компьютерный тест</th>
-                    <th>Дата подачи</th>
-                    <th>Дата окончания конкурса</th>
-                    <th>Отмена заявки</th>
-               </tr>
-                {% for application in applications %}
-                     <tr>
-                        <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
-                        <th>{{ application.get_status_display }}</th>
+        {% if applications %}
+            <div id="applications" style="margin-left: 100px;">
+                <table border="1" cellpadding="10">
+                   <caption>Ваши заявления</caption>
+                   <tr>
+                        <th>Конкурс</th>
+                        <th>Статус</th>
+                        <th>Договор</th>
+                        <th>Балл за эссе</th>
+                        <th>Балл за компьютерный тест</th>
+                        <th>Дата подачи</th>
+                        <th>Дата окончания конкурса</th>
+                        <th>Отмена заявки</th>
+                   </tr>
+                    {% for application in applications %}
+                         <tr>
+                            <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
+                            <th>{{ application.get_status_display }}</th>
 
-                        <th>
-                            {% if application.contract %}
-                                <a href="{% url "contract_detail_url" id=application.contract.id %}"> {{ application.contract.contractNo }} </a>
-                            {% else %}
-                                Нет договора
-                            {% endif %}
-                        </th>
+                            <th>
+                                {% if application.contract %}
+                                    <a href="{% url "contract_detail_url" id=application.contract.id %}"> {{ application.contract.contractNo }} </a>
+                                {% else %}
+                                    Нет договора
+                                {% endif %}
+                            </th>
 
-                        <th>{% if application.essay %} {{ application.essay }} {% else%} {% endif %}</th>
-                        <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
-                        <th>{{ application.submission_date|date:"d.m.y" }}</th>
-                        <th>{{ application.competition.end|date:"d.m.y" }}</th>
-                        <th><a href="{% url 'delete_application_url' id=application.id %}">Отмена</a></th>
-                     </tr>
-                {% endfor %}
+                            <th>{% if application.essay %} {{ application.essay }} {% else%} {% endif %}</th>
+                            <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
+                            <th>{{ application.submission_date|date:"d.m.y" }}</th>
+                            <th>{{ application.competition.end|date:"d.m.y" }}</th>
+                            <th><a href="{% url 'delete_application_url' id=application.id %}">Отмена</a></th>
+                         </tr>
+                    {% endfor %}
 
-              </table>
-        </div>
+                  </table>
+            </div>
+
+        {% else %}
+            <p><strong>Вы пока не оставляли заявок на конкурсы</strong></p>
+        {% endif %}
     </div>
 {% endblock %}
