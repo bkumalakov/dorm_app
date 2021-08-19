@@ -1,0 +1,36 @@
+{% extends 'users_app/base.html' %}
+{% block title %}
+    Войти
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="title">Войти</div>
+        <form action="{% url 'log_user_url' %}"  method="post" enctype='multipart/form-data'>
+                {% csrf_token %}
+
+                <h4 style="margin: 10px;">{{ form_log.non_field_errors }}</h4>
+                {% if verif %}
+                    <h4 style="margin: 10px; ">Ваш аккаунт еще не активирован администратором!</h4>
+                {% endif %}
+
+                <div class="user-in-details">
+                   {% for field in form_log %}
+                        <div class="input-box">
+                            <span class="details">{{ field.label }}</span>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="button">
+                    <input name="button" type="submit" value="Войти">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <a href="{% url 'registration_user_url' %}">Регистрация</a>
+                </div>
+                <div>
+                    <a href="{% url 'recovery_url' %}">Забыли пароль?</a>
+                </div>
+        </form>
+    </div>  
+{% endblock %}

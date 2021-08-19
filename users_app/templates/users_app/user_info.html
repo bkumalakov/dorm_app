@@ -1,0 +1,116 @@
+{% extends 'oil_grants/base.html' %}
+
+{% block content %}
+
+    <h1> Личный кабинет </h1>
+
+    <div style="display: flex;">
+        <div id="personal_info">
+            <p>
+                Здравствуйте, {{ request.user.username }}
+            </p>
+
+            {% if  request.user.image   %}
+
+                <p>
+                    <img src="{{ request.user.image.url }}" style="width: 100px; height: 100px;" alt="Изображение не доступно">
+                </p>
+
+            {% endif %}
+            <p>
+                Имя: {% if request.user.first_name %} {{ request.user.first_name }} {% else %} {% endif %}
+            </p>
+
+            <p>
+                Фамилия: {{ request.user.last_name }}
+            </p>
+
+            <p>
+                Отчество: {% if request.user.patronymic %} {{ request.user.patronymic }} {% else %} {% endif %}
+            </p>
+
+            <p>
+                Email: {{ request.user.email }}
+            </p>
+
+            <p>
+                ИИН: {{ request.user.uin }}
+            </p>
+
+            <p>
+                Статус:  {% if request.user.status %} {{ request.user.status }} {% else %} {% endif %}
+            </p>
+
+            <p>
+                Место рождения: {% if request.user.birthplace %} {{ request.user.birthplace }} {% else %} {% endif %}
+            </p>
+
+             {% if request.user.receipt_date %}
+                <p>
+                    Дата поступления: {{ request.user.receipt_date }}
+                </p>
+             {% endif %}
+
+            <p>
+                GPA: {{ request.user.gpa }}
+            </p>
+
+            {% if request.user.edProgram %}
+
+                <p>
+                    Образовательная программа: {{ request.user.edProgram.p_name }}
+                </p>
+
+            {% endif %}
+            <p>
+                <a href="{% url 'update_user_url' %}">Редактировать</a>
+            </p>
+
+            <p>
+                <a href="{% url 'password_update' %}">Обновить пароль</a>
+            </p>
+        </div>
+
+        {% if applications %}
+            <div id="applications" style="margin-left: 100px;">
+                <table border="1" cellpadding="10">
+                   <caption>Ваши заявления</caption>
+                   <tr>
+                        <th>Конкурс</th>
+                        <th>Статус</th>
+                        <th>Договор</th>
+                        <th>Балл за эссе</th>
+                        <th>Балл за компьютерный тест</th>
+                        <th>Дата подачи</th>
+                        <th>Дата окончания конкурса</th>
+                        <th>Отмена заявки</th>
+                   </tr>
+                    {% for application in applications %}
+                         <tr>
+                            <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
+                            <th>{{ application.get_status_display }}</th>
+
+                            <th>
+                                {% if application.contract %}
+                                    <a href="{% url "contract_detail_url" id=application.contract.id %}"> {{ application.contract.contractNo }} </a>
+                                {% else %}
+                                    Нет договора
+                                {% endif %}
+                            </th>
+
+                            <th>{% if application.essay %} {{ application.essay }} {% else%} {% endif %}</th>
+                            <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
+                            <th>{{ application.submission_date|date:"d.m.y" }}</th>
+                            <th>{{ application.competition.end|date:"d.m.y" }}</th>
+                            <th><a href="{% url 'delete_application_url' id=application.id %}">Отмена</a></th>
+                         </tr>
+                    {% endfor %}
+
+                  </table>
+            </div>
+
+        {% else %}
+            <p><strong>Вы пока не оставляли заявок на конкурсы</strong></p>
+        {% endif %}
+    </div>
+{% endblock %}

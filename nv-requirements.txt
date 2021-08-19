@@ -1,0 +1,7 @@
+django-phonenumber-field
+django-user-agents
+phonenumbers
+pillow
+pip-chill
+requests
+six

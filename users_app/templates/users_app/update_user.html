@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+{% extends 'oil_grants/base.html' %}
+
+{% block content %}
+    <form action="{% url 'update_user_url' %}"  method="post" enctype='multipart/form-data'>
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+        {% for field in form %}
+
+            <div class="form-group">
+
+            {{ field.label }}
+            {{ field }}
+                {% if field.errors %}
+                    <div class="alert alert-danger">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endfor %}
+
+        <p>
+            <button type="submit" name="button" class="btn btn-primary"> Update! </button>
+        </p>
+
+    </form>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'users_app/base.html' %}
+
+{% block title %}
+    >Восстановление
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="title">Восстановление аккаунта</div>
+        <form action="{% url 'recovery_url' %}" method="post" enctype='multipart/form-data'>
+            {% csrf_token %}
+                <div class="user-in-details">
+                    <div class="input-box">
+                        <span class="details">Email</span>
+                        <input type="text" name="email" placeholder="Email адрес" required>
+                    </div>
+                </div>
+                <div class="text-send-code">
+                    <p>Введите свой email и нажмите на кнопку отправить</p>
+                </div>
+                <div class="button">
+                    <input type="submit" value="Отправить">
+                </div>  
+        </form>
+    </div>  
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'oil_grants/base.html' %}
+
+      {% block title %}
+          Главная
+      {% endblock %}
+
+      {% block content %}
+
+            <div class="container">
+                <div class="text-center mt-5 mb-5">
+                    <h1>Список грантов</h1>
+                </div>
+                {% for competition in competitions %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="table">
+                                <p class="text-center text-danger">Конкурс №{{ competition.competition_number }}</p>
+                                <h2 class="text-center mb-3">{{ competition.company.name }}</h2>
+                                <div class="container text-center">
+                                    <div class="row justify-content-md-center">
+                                      <div class="col">
+                                        <strong>Начало</strong><br><br>
+                                        <div class="col">
+                                           {{ competition.start|date:'d.m.y' }}
+                                          </div>
+                                      </div>
+                                      <div class="col">
+                                        <strong>Статус</strong><br><br>
+                                        <div class="col">
+                                            {{ competition.get_status_display }}
+                                          </div>
+                                      </div>
+                                      <div class="col">
+                                        <strong>Конец</strong><br><br>
+                                        <div class="col">
+                                           {{ competition.end|date:'d.m.y' }}
+                                          </div>
+                                      </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row mb-3">
+                                      <div class="col">
+                                        <strong>Спонсор</strong><br><br>
+                                        <div class="col">
+                                            {{ competition.company.name }}
+                                        </div>
+                                      </div>
+                                      <div class="col">
+                                        <strong>Адрес компаний</strong><br><br>
+                                        <div class="col">
+                                            {{ competition.company.address }}
+                                        </div>
+                                      </div>
+                                      <div class="col">
+                                        <strong>Контакты</strong><br><br>
+                                        <div class="col">
+                                           {{ competition.company.contact_num }}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <hr>
+                                <div class="mt-4 text-center">
+                                    {% if competition.status != "ended" and competition.status != "didn't start" %}
+                                        <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                        <strong> &nbsp; &nbsp;Идет прием заявлений</strong>
+                                    {% elif competition.status == "didn't start"%}
+                                         <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                        <strong> &nbsp; &nbsp;Скоро</strong>
+                                    {% elif competition.status == "ended" %}
+                                         <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                        <strong> &nbsp; &nbsp;Конкурс завершился</strong>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endblock %}

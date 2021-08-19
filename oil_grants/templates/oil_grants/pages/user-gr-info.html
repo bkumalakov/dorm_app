@@ -1,0 +1,87 @@
+{% extends 'oil_grants/base.html' %}
+
+{% block title %}
+    Ваши заявления
+{% endblock %}
+
+{% block content %}
+
+        <div class="container">
+        
+            <section class="section-content py-5">
+                <div class="row">
+                    <aside class="col-lg-3 mb-5"> 
+            <!-- ============= COMPONENT ============== -->
+                          <nav class="sidebar card py-2">
+                                <ul class="nav flex-column ">
+                                     <li class="nav-item">
+                                        <a class="nav-link text-dark" href="{% url 'user_info_url' %}"> Личный кабинет </a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link text-dark" href="{% url 'update_user_url' %}"> Редактировать профиль </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" href="{% url 'password_update' %}"> Изменить пароль </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" href="{% url 'applications_url' %}"> Ваши заявления </a>
+                                    </li>
+                                </ul>
+                            </nav>
+            <!-- ============= COMPONENT END// ============== -->	
+                    </aside>
+                    <main class="col-lg-9">
+                    {% if applications %}
+
+                        <h2 class="text-center mb-3">Ваши заявления</h2>
+                            <div class="table-responsive mb-4">
+                                <table class="table table-bordered">
+                                    <thead>
+                                      <tr class="table">
+                                        <th class="table-primary" scope="col">Конкурс</th>
+                                        <th class="table-primary" scope="col">Статус</th>
+                                        <th class="table-primary" scope="col">Договор</th>
+                                        <th class="table-primary" scope="col">Балл за эссе</th>
+                                        <th class="table-primary" scope="col">Балл за комп. тест</th>
+                                        <th class="table-primary" scope="col">Дата подачи</th>
+                                        <th class="table-primary" scope="col">Дата окончания</th>
+                                      </tr>
+                                    </thead>
+
+                                    <tbody class="text-center">
+                                         {% for application in applications %}
+                                             <tr>
+                                                <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
+                                                <th>{{ application.get_status_display }}</th>
+
+                                                <th>
+                                                    {% if application.contract %}
+                                                        №{{ application.contract.contractNo }}
+                                                    {% else %}
+                                                        Нет договора
+                                                    {% endif %}
+                                                </th>
+
+                                                <th>{% if application.essay %} {{ application.essay }} {% else%} {% endif %}</th>
+                                                <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
+                                                <th>{{ application.submission_date|date:"d.m.y" }}</th>
+                                                <th>{{ application.competition.end|date:"d.m.y" }}</th>
+{#                                                <th><a href="{% url 'delete_application_url' id=application.id %}">Отмена</a></th>#}
+                                             </tr>
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                    </main>
+                        {% else %}
+                        <h2>Вы пока не оставляли заявления на конкурсы</h2>
+
+                    {% endif %}
+                </div>
+            </section>
+        
+        </div>
+    
+
+{% endblock %}
