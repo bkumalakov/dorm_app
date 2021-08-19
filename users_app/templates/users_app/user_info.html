@@ -18,7 +18,7 @@
 
             {% endif %}
             <p>
-                Имя: {{ request.user.first_name }}
+                Имя: {% if request.user.first_name %} {{ request.user.first_name }} {% else %} {% endif %}
             </p>
 
             <p>
@@ -26,7 +26,7 @@
             </p>
 
             <p>
-                Отчество: {{ request.user.patronymic }}
+                Отчество: {% if request.user.patronymic %} {{ request.user.patronymic }} {% else %} {% endif %}
             </p>
 
             <p>
@@ -38,11 +38,11 @@
             </p>
 
             <p>
-                Статус: {{ request.user.status }}
+                Статус:  {% if request.user.status %} {{ request.user.status }} {% else %} {% endif %}
             </p>
 
             <p>
-                Место рождения: {{ request.user.birthplace }}
+                Место рождения: {% if request.user.birthplace %} {{ request.user.birthplace }} {% else %} {% endif %}
             </p>
 
              {% if request.user.receipt_date %}
@@ -82,6 +82,7 @@
                     <th>Балл за компьютерный тест</th>
                     <th>Дата подачи</th>
                     <th>Дата окончания конкурса</th>
+                    <th>Отмена заявки</th>
                </tr>
                 {% for application in applications %}
                      <tr>
@@ -100,6 +101,7 @@
                         <th>{% if application.computerTest %} {{ application.computerTest }} {% else%} {% endif %}</th>
                         <th>{{ application.submission_date|date:"d.m.y" }}</th>
                         <th>{{ application.competition.end|date:"d.m.y" }}</th>
+                        <th><a href="{% url 'delete_application_url' id=application.id %}">Отмена</a></th>
                      </tr>
                 {% endfor %}
 

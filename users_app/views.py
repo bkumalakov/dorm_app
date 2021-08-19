@@ -71,12 +71,16 @@ def email_verification(request, user, email):
 
 
 class UserInfoView(LoginRequiredMixin, View):
+    login_url = 'log_user_url'
+
     def get(self, request,):
         applications = request.user.applications.all()
         return render(self.request, 'users_app/user_info.html', context={'applications': applications, })
 
 
 class UpdateUserView(LoginRequiredMixin, View):
+    login_url = 'log_user_url'
+
     def post(self, request):
         form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
 
@@ -105,7 +109,9 @@ class Main(View):
         return render(request, 'users_app/Main.html', context={'users': users, })
 
 
-class Logout(View):
+class Logout(LoginRequiredMixin, View):
+    login_url = 'log_user_url'
+
     @staticmethod
     def get(request):
         logout(request)
@@ -115,7 +121,7 @@ class Logout(View):
 class Registration(View):
     def post(self, request):
         bound_form = RegistrationForm(request.POST, request.FILES)
-        if bound_form.is_valid():
+        if bound_form.is_valid() and self.request.recaptcha_is_valid:
             bound_form.save()
             obj_cleaned = bound_form.cleaned_data.get('email')
             raw_password = bound_form.cleaned_data.get('password1')
@@ -126,8 +132,11 @@ class Registration(View):
                 user.image = image
             user.is_active = False
             user.save()
-
             return render(request, 'users_app/confirm_account.html')
+
+        elif not self.request.recaptcha_is_valid:
+            return render(request, "users_app/index.html", context={'form': bound_form, 'errors': ['Подтвердите капчу']})
+
         return render(request, "users_app/index.html", context={'form': bound_form, 'errors': bound_form.errors})
 
     @staticmethod
@@ -204,6 +213,7 @@ class AccountRecovery(View):
         domain = get_current_site(request).domain
         link = reverse('restore_url', kwargs={'uidb64': uidb64, 'token': token})
         recovery_url = 'http://' + domain + link
+        print(recovery_url)
         send_mail(
             'Restore your password',
             'Please click on link to change your password \n' + recovery_url,
@@ -219,23 +229,22 @@ class AccountRecovery(View):
 
 
 class PasswordRestore(View):
-    @staticmethod
-    def post(request, uidb64, token):
+    def post(self, request, uidb64, token):
         email = str(urlsafe_base64_decode(uidb64))[2: len(str(urlsafe_base64_decode(uidb64))) - 1]
         user = Users.objects.get(email=email)
         password1 = request.POST.get('password1')
         password2 = request.POST.get('password2')
-        if password1 == password2:
+        if password1 == password2 and self.request.recaptcha_is_valid:
             try:
                 validate_password(password2)
                 is_valid = True
 
             except ValidationError as e:
                 return render(request, 'users_app/restore_password.html', context={'email': email,
-                                                                                'uidb64': uidb64,
-                                                                                'token': token,
-                                                                                'errors': e,
-                                                                                })
+                                                                                   'uidb64': uidb64,
+                                                                                   'token': token,
+                                                                                   'errors': e,
+                                                                                   })
 
             if is_valid:
                 user.set_password(password1)
@@ -243,10 +252,10 @@ class PasswordRestore(View):
                 return redirect('log_user_url')
         else:
             return render(request, 'users_app/restore_password.html', context={'email': email,
-                                                                            'uidb64': uidb64,
-                                                                            'token': token,
-                                                                            'errors': 'Passwords not equal',
-                                                                            })
+                                                                               'uidb64': uidb64,
+                                                                               'token': token,
+                                                                               'errors': ['Passwords not equal'],
+                                                                               })
 
     @staticmethod
     def get(request, uidb64, token):
@@ -262,9 +271,11 @@ class PasswordRestore(View):
 
 
 class PasswordUpdateView(LoginRequiredMixin, View):
+    login_url = 'log_user_url'
+
     def post(self, request):
         bound_form = PasswordUpdateForm(request.POST)
-        if bound_form.is_valid():
+        if bound_form.is_valid() and self.request.recaptcha_is_valid:
             old_password = bound_form.cleaned_data.get('old_password')
             new_password1 = bound_form.cleaned_data.get('new_password1')
             new_password2 = bound_form.cleaned_data.get('new_password2')

@@ -58,7 +58,7 @@ class AddApplicationView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request, id):
-        if request.POST.get("yes"):
+        if request.POST.get("yes") and self.request.recaptcha_is_valid:
             competition = get_object_or_404(Competitions, id=id)
             if competition.status != "ended" and competition.status != "didn't start":
                 application = Applications.objects.create(student=request.user,
@@ -67,9 +67,32 @@ class AddApplicationView(LoginRequiredMixin, View):
                                                                                            'application': application})
             else:
                 return HttpResponseBadRequest()
+        elif not self.request.recaptcha_is_valid:
+            competition = get_object_or_404(Competitions, id=id)
+            return render(self.request, "oil_grants/confirm_application.html", context={'competition': competition,})
 
         return redirect('competition_detail_url', id=id)
 
     def get(self, request, id):
         competition = get_object_or_404(Competitions, id=id)
         return render(self.request, "oil_grants/confirm_application.html", context={'competition': competition, })
+
+
+class DeleteApplicationView(LoginRequiredMixin, View):
+    login_url = 'log_user_url'
+
+    def post(self, request, id):
+        if request.POST.get("yes") and self.request.recaptcha_is_valid:  # Можно добавить валидацию по статусу заявки
+            application = get_object_or_404(Applications, id=id, student=request.user)
+            application.delete()
+            return redirect('user_info_url')
+
+        elif not self.request.recaptcha_is_valid:
+            application = get_object_or_404(Applications, id=id, student=request.user)
+            return render(self.request, "oil_grants/confirm_delete_application.html", context={'application': application,})
+
+        return redirect('user_info_url')
+
+    def get(self, request, id):
+        application = get_object_or_404(Applications, id=id, student=request.user)
+        return render(self.request, "oil_grants/confirm_delete_application.html", context={'application': application, })

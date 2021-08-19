@@ -75,8 +75,8 @@ class RegistrationForm(UserCreationForm):
     password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Подтверждение пароля'}),
                                 label="Подтверждение пароля")
 
-    edProgram = forms.ModelChoiceField(widget=forms.Select(attrs={'style': 'width: 300px; height: 45px;'}),
-                                       queryset=EdProgram.objects.all())
+    edProgram = forms.ModelChoiceField(widget=forms.Select(attrs={'placeholder': 'Специальность', 'style': 'width: 300px; height: 45px;'}),
+                                       queryset=EdProgram.objects.all(),  label="Специальность")
 
     class Meta:
         model = Users

@@ -112,8 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-# LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -143,10 +142,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PHONENUMBER_DB_FORMAT = 'NATIONAL'
 PHONENUMBER_DEFAULT_REGION = 'KZ'
 
+
+def get_email_data(base64_message='MzYxMjcxMjkwMjA4MTM0Njc5ODUxOEF6YQ=='):
+    base64_bytes = base64_message.encode('ascii')
+    message_bytes = base64.b64decode(base64_bytes)
+    message = message_bytes.decode('ascii')
+    return message
+
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = ''
+EMAIL_HOST_USER = 'azaza7087@gmail.com'
+EMAIL_HOST_PASSWORD = str(get_email_data())
+DEFAULT_FROM_EMAIL = '<anything you want>'
+
+
+GOOGLE_RECAPTCHA_SECRET_KEY = '6Lf2YAscAAAAAJCEytPKaL4v65hbKtmT2KuNB8yJ'

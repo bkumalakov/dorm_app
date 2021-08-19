@@ -3,4 +3,5 @@ django-user-agents
 phonenumbers
 pillow
 pip-chill
+requests
 six

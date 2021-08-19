@@ -3,11 +3,9 @@
 {% block content %}
     <div style="width: 400px; border: black solid 2px; margin: 50px;">
         <p>Название компании спонсора: {{ competition.company.name }}</p>
-        <p>
-            <p>Описание компании спонсора: {{ competition.company.description }}</p>
-            <p>Контактные данные спонсора: {{ competition.company.contact_num }}</p>
-            <p>Адрес спонсора: {{ competition.company.address }}</p>
-        </p>
+        <p>Описание компании спонсора: {{ competition.company.description }}</p>
+        <p>Контактные данные спонсора: {{ competition.company.contact_num }}</p>
+        <p>Адрес спонсора: {{ competition.company.address }}</p>
 
         <p>Продолжительность: {{ competition.start }} - {{ competition.end }}</p>
         <p>Статус: {{ competition.get_status_display }}</p>
@@ -20,12 +18,13 @@
                     <button type="submit">Оставить заявку на участие!</button>
                 </form>
             {% elif competition.status == "didn't start" %}
-              <p><strong>Конкурс не начался!</strong></p>
+                 <p><strong>Конкурс не начался!</strong></p>
             {% else %}
                  <p><strong>Конкурс завершен: {{ competition.end }}</strong></p>
             {% endif %}
         {% else %}
             <p><strong>Заявка отправлена</strong></p>
+            <p><a href="{% url 'delete_application_url' id=application.id %}">Отменить заявку</a></p>
         {% endif %}
     </div>
 {% endblock %}
