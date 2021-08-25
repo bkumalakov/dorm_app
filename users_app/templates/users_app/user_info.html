@@ -22,7 +22,7 @@
             </p>
 
             <p>
-                Фамилия: {{ request.user.last_name }}
+                Фамилия: {% if request.user.first_name %} {{ request.user.last_name }} {% else %} {% endif %}
             </p>
 
             <p>
