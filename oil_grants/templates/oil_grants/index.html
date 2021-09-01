@@ -62,13 +62,13 @@
                                   <hr>
                                 <div class="mt-4 text-center">
                                     {% if competition.status != "ended" and competition.status != "didn't start" %}
-                                        <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                        <a href="{% url "competition_detail_url" competition_number=competition.competition_number %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
                                         <strong> &nbsp; &nbsp;Идет прием заявлений</strong>
                                     {% elif competition.status == "didn't start"%}
-                                         <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                         <a href="{% url "competition_detail_url" competition_number=competition.competition_number %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
                                         <strong> &nbsp; &nbsp;Скоро</strong>
                                     {% elif competition.status == "ended" %}
-                                         <a href="{% url "competition_detail_url" id=competition.id %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
+                                         <a href="{% url "competition_detail_url" competition_number=competition.competition_number %}"><button class="btn btn-outline-primary" type="button"> Подробнее </button></a>
                                         <strong> &nbsp; &nbsp;Конкурс завершился</strong>
                                     {% endif %}
 

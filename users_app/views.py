@@ -75,13 +75,10 @@ class UserInfoView(LoginRequiredMixin, View):
         return render(self.request, 'oil_grants/pages/information.html', )
 
 
-class UpdateUserView(LoginRequiredMixin, View):
+class UpdateUserView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request):
-        if request.user.is_superuser:
-            return HttpResponseForbidden()
-
         form = UpdateUserForm(request.POST, request.FILES, instance=request.user)
 
         if form.is_valid():
@@ -95,8 +92,6 @@ class UpdateUserView(LoginRequiredMixin, View):
         return render(self.request, 'oil_grants/pages/edit.html', context={'form': form, })
 
     def get(self, request):
-        if request.user.is_superuser:
-            return HttpResponseForbidden()
         form = UpdateUserForm(instance=request.user)
         return render(self.request, 'oil_grants/pages/edit.html', context={'form': form, })
 
@@ -162,7 +157,7 @@ class Login(View):
         if bound_form.is_valid():
             user = authenticate(username=bound_form.cleaned_data['username'],
                                 password=bound_form.cleaned_data['password'], )
-            if user.is_verified:
+            if user.is_verified or user.is_superuser:
                 login(request, user)
                 user = Users.objects.get(id=request.user.id)
                 user.last_update = datetime.now()
@@ -268,7 +263,7 @@ class PasswordRestore(View):
                                                                            'token': token})
 
 
-class PasswordUpdateView(LoginRequiredMixin, View):
+class PasswordUpdateView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request):
