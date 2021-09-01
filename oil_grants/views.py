@@ -1,9 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.views import View
 from django.db.models import Q
 from .models import *
+from .utils import LoginRequiredAndAdminDeniedMixin
 
 
 def get_or_pass(student, competition):
@@ -36,19 +37,20 @@ class CompetitionDetailView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     @staticmethod
-    def post(request, id):
-        return redirect('add_application_url', id=id)
+    def post(request, competition_number):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
+        return redirect('add_application_url', competition_number=competition_number)
 
-    def get(self, request, id):
-        competition = get_object_or_404(Competitions, id=id)
+    def get(self, request, competition_number):
+        competition = get_object_or_404(Competitions, competition_number=competition_number)
         check_dates([competition])
-
         application = get_or_pass(request.user, competition)
         return render(self.request, "oil_grants/pages/info-competition.html", context={'competition': competition,
                                                                                        'application': application})
 
 
-class ApplicationListView(LoginRequiredMixin, View):
+class ApplicationListView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def get(self, request):
@@ -56,7 +58,7 @@ class ApplicationListView(LoginRequiredMixin, View):
         return render(self.request, "oil_grants/pages/user-gr-info.html", context={'applications': applications})
 
 
-class ContractDetailView(LoginRequiredMixin, View):
+class ContractDetailView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def get(self, request, id):
@@ -67,12 +69,12 @@ class ContractDetailView(LoginRequiredMixin, View):
             return HttpResponseForbidden()
 
 
-class AddApplicationView(LoginRequiredMixin, View):
+class AddApplicationView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
-    def post(self, request, id):
+    def post(self, request, competition_number):
         if request.POST.get("yes") and self.request.recaptcha_is_valid:
-            competition = get_object_or_404(Competitions, id=id)
+            competition = get_object_or_404(Competitions, competition_number=competition_number)
             if competition.status != "ended" and competition.status != "didn't start":
                 application = Applications.objects.create(student=request.user,
                                                           competition=competition, )
@@ -82,17 +84,17 @@ class AddApplicationView(LoginRequiredMixin, View):
             else:
                 return HttpResponseBadRequest()
         elif not self.request.recaptcha_is_valid:
-            competition = get_object_or_404(Competitions, id=id)
+            competition = get_object_or_404(Competitions, competition_number=competition_number)
             return render(self.request, "oil_grants/pages/info-competition.html", context={'competition': competition})
 
-        return redirect('competition_detail_url', id=id)
+        return redirect('competition_detail_url', competition_number=competition_number)
 
-    def get(self, request, id):
-        competition = get_object_or_404(Competitions, id=id)
+    def get(self, request, competition_number):
+        competition = get_object_or_404(Competitions, competition_number=competition_number)
         return render(self.request, "oil_grants/pages/info-competition.html", context={'competition': competition, })
 
 
-class DeleteApplicationView(LoginRequiredMixin, View):
+class DeleteApplicationView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request, id):

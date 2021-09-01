@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.http import HttpResponseForbidden
 from six import text_type
 from django.contrib.sites.shortcuts import get_current_site
 from oil_grants.urls import *
@@ -69,10 +70,12 @@ class UserInfoView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def get(self, request,):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
         return render(self.request, 'oil_grants/pages/information.html', )
 
 
-class UpdateUserView(LoginRequiredMixin, View):
+class UpdateUserView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request):
@@ -154,7 +157,7 @@ class Login(View):
         if bound_form.is_valid():
             user = authenticate(username=bound_form.cleaned_data['username'],
                                 password=bound_form.cleaned_data['password'], )
-            if user.is_verified:
+            if user.is_verified or user.is_superuser:
                 login(request, user)
                 user = Users.objects.get(id=request.user.id)
                 user.last_update = datetime.now()
@@ -260,10 +263,12 @@ class PasswordRestore(View):
                                                                            'token': token})
 
 
-class PasswordUpdateView(LoginRequiredMixin, View):
+class PasswordUpdateView(LoginRequiredAndAdminDeniedMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
         bound_form = PasswordUpdateForm(request.POST)
         if bound_form.is_valid() and self.request.recaptcha_is_valid:
             old_password = bound_form.cleaned_data.get('old_password')

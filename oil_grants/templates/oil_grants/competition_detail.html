@@ -13,7 +13,7 @@
 
         {% if not application %}
             {% if competition.status != "ended" and competition.status != "didn't start" %}
-                <form action="{% url 'competition_detail_url' id=competition.id%}" method="post">
+                <form action="{% url 'competition_detail_url' competition_number=competition.competition_number%}" method="post">
                     {% csrf_token %}
                     <button type="submit">Оставить заявку на участие!</button>
                 </form>

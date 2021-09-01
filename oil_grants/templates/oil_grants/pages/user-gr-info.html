@@ -51,7 +51,7 @@
                                     <tbody class="text-center">
                                          {% for application in applications %}
                                              <tr>
-                                                <th><a href="{% url 'competition_detail_url' id=application.competition.id %}">{{ application.competition.company.name }}</a></th>
+                                                <th><a href="{% url 'competition_detail_url' competition_number=application.competition.competition_number %}">{{ application.competition.company.name }}</a></th>
                                                 <th>{{ application.get_status_display }}</th>
 
                                                 <th>
