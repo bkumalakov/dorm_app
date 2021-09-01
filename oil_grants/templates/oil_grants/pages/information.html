@@ -62,8 +62,11 @@
                                               <h6 class="mb-2">Отчество:</h6>
                                             </div>
                                             <div class="col-sm-8 text-secondary">
-                                                {{ request.user.patronymic }}
+                                                {% if request.user.patronymic %}
+                                                    {{ request.user.patronymic }}
+                                                {% else %}
 
+                                                {% endif %}
                                             </div>
                                           </div>
                                           <hr>
@@ -81,7 +84,11 @@
                                               <h6 class="mb-2">Телефонный номер:</h6>
                                             </div>
                                             <div class="col-sm-8 text-secondary">
-                                                {{ request.user.phone_number }}
+                                                {% if request.user.phone_number %}
+                                                    {{ request.user.phone_number }}
+                                                {% else %}
+
+                                                {% endif %}
                                             </div>
                                           </div>
                                           <hr>

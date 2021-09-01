@@ -87,7 +87,7 @@ class Competitions(models.Model):
     )
 
     start = models.DateField(verbose_name="Дата начала приема заявок")
-    end = models.DateField(verbose_name="Дата начала приема заявок")
+    end = models.DateField(verbose_name="Дата окончания приема заявок")
     competition_number = models.CharField(max_length=20, blank=True, unique=True)
     description = models.TextField(verbose_name="Описание", blank=True, default="")
     status = models.CharField(choices=CHOICES, max_length=15, default="didn't start", verbose_name="Статус")

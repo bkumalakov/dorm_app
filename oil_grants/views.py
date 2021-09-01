@@ -37,6 +37,8 @@ class CompetitionDetailView(LoginRequiredMixin, View):
 
     @staticmethod
     def post(request, id):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
         return redirect('add_application_url', id=id)
 
     def get(self, request, id):
@@ -71,6 +73,9 @@ class AddApplicationView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request, id):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
+
         if request.POST.get("yes") and self.request.recaptcha_is_valid:
             competition = get_object_or_404(Competitions, id=id)
             if competition.status != "ended" and competition.status != "didn't start":
@@ -88,6 +93,7 @@ class AddApplicationView(LoginRequiredMixin, View):
         return redirect('competition_detail_url', id=id)
 
     def get(self, request, id):
+
         competition = get_object_or_404(Competitions, id=id)
         return render(self.request, "oil_grants/pages/info-competition.html", context={'competition': competition, })
 
@@ -96,6 +102,9 @@ class DeleteApplicationView(LoginRequiredMixin, View):
     login_url = 'log_user_url'
 
     def post(self, request, id):
+        if request.user.is_superuser:
+            return HttpResponseForbidden()
+
         if request.POST.get("yes") and self.request.recaptcha_is_valid:
             application = get_object_or_404(Applications, id=id, student=request.user)
             if application.contract:

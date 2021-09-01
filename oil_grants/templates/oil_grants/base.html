@@ -28,9 +28,13 @@
                                 </form>
                               <ul class="navbar-nav">
                                 <li class="nav-item dropdown">
-                                  <a class="nav-link dropdown-toggle text-light " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Меню
-                                  </a>
+                                      {% if not request.user.is_superuser %}
+                                          <a class="nav-link dropdown-toggle text-light " href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Меню
+                                          </a>
+                                      {% else %}
+                                          <a class="nav-link text-light " id="navbarDropdown" role="button"  href="{% url 'logout_url' %}">Выйти</a>
+                                      {% endif %}
                                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-rg-start" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" href="{% url 'user_info_url' %}">Профиль</a></li>
                                     <li><hr class="dropdown-divider"></li>
